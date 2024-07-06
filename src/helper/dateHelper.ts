@@ -1,4 +1,4 @@
-import { parse, addDays, format } from 'date-fns';
+import { parse, addDays, addHours, format } from 'date-fns';
 import { fromZonedTime } from "date-fns-tz";
 
 export const HOUR_00_00_00 = '00:00:00';
@@ -86,6 +86,13 @@ export const dateAddDays = (date: Date, days: number = 1): Date => {
 };
 
 /**
+ * Adds hours to the given date.
+ */
+export const dateAddHours = (date: Date, hours: number = 1): Date => {
+    return addHours(date, hours);
+};
+
+/**
  * Returns the date as UTC with timezone.
  */
 export const dateISOWithTimeOffset = (date: Date): string => {
@@ -112,6 +119,26 @@ export const dateRound15Minutes = (selectedDate: Date, timeString: string, fromU
     let date = dateSetTime(selectedDate, timeString, fromUTC);
 
     const roundedMinute = Math.round(date.getMinutes() / 15) * 15;
+
+    if (roundedMinute === 60) {
+        date.setHours(date.getHours() + 1);
+        date.setMinutes(0);
+        date.setSeconds(0);
+    } else {
+        date.setMinutes(roundedMinute);
+        date.setSeconds(0);
+    }
+
+    return dateFormat(date, FORMAT_HOUR_MINUTE);
+};
+
+/**
+ * Round time to 60 minutes.
+ */
+export const dateRound60Minutes = (selectedDate: Date, timeString: string, fromUTC: boolean = false): string => {
+    let date = dateSetTime(selectedDate, timeString, fromUTC);
+
+    const roundedMinute = Math.round(date.getMinutes() / 60) * 60;
 
     if (roundedMinute === 60) {
         date.setHours(date.getHours() + 1);

@@ -75,8 +75,6 @@ const PriceChart: React.FC<PriceChartProps> = ({ selectedDate, selectedCountry }
     const [priceMin, setPriceMin] = useState<number>(0);
     const [priceMax, setPriceMax] = useState<number>(0);
 
-    selectedCountry = selectedCountry === 'de'? 'DE-LU' : selectedCountry;
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -104,7 +102,7 @@ const PriceChart: React.FC<PriceChartProps> = ({ selectedDate, selectedCountry }
         };
 
         fetchData().catch(console.error);
-    }, [selectedDate]);
+    }, [selectedDate, selectedCountry]);
 
     const selectedDateFormatted = dateFormat(selectedDate, FORMAT_DATE_DE);
     const selectedCountryFormatted = selectedCountry.toUpperCase();

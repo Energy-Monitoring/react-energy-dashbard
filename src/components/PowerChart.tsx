@@ -2,18 +2,31 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, ReferenceLine } from 'recharts';
 import { chartConfigColors, chartConfigTranslations, chartConfigEnabled, chartConfigColorText, chartConfigYAxisPositionX, chartConfigYAxisPositionY, chartConfigYAxisFontSize, chartConfigAxisTickStyle} from '../config/chartConfig';
-import { dateFormat, dateISOWithTimeOffset, dateRound15Minutes, dateSetTime, HOUR_00_00_00, HOUR_23_59_59, FORMAT_DATE_DE, FORMAT_HOUR_MINUTE} from "../helper/dateHelper";
+import {
+    dateFormat,
+    dateISOWithTimeOffset,
+    dateRound15Minutes,
+    dateSetTime,
+    HOUR_00_00_00,
+    HOUR_23_59_59,
+    FORMAT_DATE_DE,
+    FORMAT_HOUR_MINUTE,
+    dateRound60Minutes
+} from "../helper/dateHelper";
 import {
     DataPointPower,
     getDataPointPowerData,
     getDataPointPowerKeys, getPowerLegendPayload,
     processDatePower, processSunriseSunset
 } from "../helper/dataHelper";
+import {positions} from "../config/countries";
 
 interface PowerChartProps {
     selectedDate: Date;
     selectedCountry: string;
 }
+
+let distanceGlobal = 15;
 
 /**
  * Custom tooltip for power chart.
@@ -25,7 +38,7 @@ const CustomTooltipPower = ({ active, payload, label }: any) => {
 
     const currentTime = new Date(`1970-01-01T${label}:00`);
     const nextTime = new Date(currentTime);
-    nextTime.setMinutes(currentTime.getMinutes() + 15);
+    nextTime.setMinutes(currentTime.getMinutes() + distanceGlobal);
     const formattedCurrentTime = currentTime.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
     const formattedNextTime = nextTime.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 
@@ -58,16 +71,28 @@ const CustomLabelSunriseSunset = ({ viewBox, value }: { viewBox: any; value: str
     );
 };
 
+const getCoordinate = (selectedCountry: string): {latitude: number, longitude: number, name: string, distance: number} => {
+    if (positions.hasOwnProperty(selectedCountry)) {
+        return positions[selectedCountry];
+    }
+
+    return positions['de'];
+}
+
 /**
 * PowerChart component.
 */
-const PowerChart: React.FC<PowerChartProps> = ({ selectedDate, selectedCountry }) => {
+const PowerChart: React.FC<PowerChartProps> = ({ selectedDate, selectedCountry}) => {
     const [data, setData] = useState<DataPointPower[]>([]);
     const [otherKeys, setOtherKeys] = useState<string[]>([]);
     const [sunrise, setSunrise] = useState('');
     const [sunset, setSunset] = useState('');
     const [sunriseReal, setSunriseReal] = useState('');
     const [sunsetReal, setSunsetReal] = useState('');
+    const [latitude, setLatitude] = useState<number>(51.1333);
+    const [longitude, setLongitude] = useState<number>(10.4167);
+    const [name, setName] = useState<string>('Deutschland');
+    const [distance, setDistance] = useState<number>(15);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -75,8 +100,14 @@ const PowerChart: React.FC<PowerChartProps> = ({ selectedDate, selectedCountry }
                 const powerApiUrl = process.env.REACT_APP_POWER_API_URL;
                 const sunApiUrl = process.env.REACT_APP_SUN_API_URL;
 
-                const latitude = process.env.REACT_APP_SUNSET_LATITUDE;
-                const longitude = process.env.REACT_APP_SUNSET_LONGITUDE;
+                const { latitude, longitude, name , distance } = getCoordinate(selectedCountry);
+
+                setLatitude(latitude);
+                setLongitude(longitude);
+                setName(name);
+                setDistance(distance);
+
+                distanceGlobal = distance;
 
                 const dateFrom = dateISOWithTimeOffset(dateSetTime(selectedDate, HOUR_00_00_00));
                 const dateTo = dateISOWithTimeOffset(dateSetTime(selectedDate, HOUR_23_59_59));
@@ -90,21 +121,32 @@ const PowerChart: React.FC<PowerChartProps> = ({ selectedDate, selectedCountry }
                 const { data, otherKeys } = processDatePower(powerResponse.data);
                 const { sunrise, sunset } = processSunriseSunset(sunriseSunsetResponse.data);
 
+                console.log(sunrise, sunset);
+
                 setOtherKeys(otherKeys);
                 setData(data);
 
                 setSunriseReal(dateFormat(dateSetTime(selectedDate, sunrise, true), FORMAT_HOUR_MINUTE));
                 setSunsetReal(dateFormat(dateSetTime(selectedDate, sunset, true), FORMAT_HOUR_MINUTE));
 
-                setSunrise(dateRound15Minutes(selectedDate, sunrise, true));
-                setSunset(dateRound15Minutes(selectedDate, sunset, true));
+                switch (distance) {
+                    case 15:
+                        setSunrise(dateRound15Minutes(selectedDate, sunrise, true));
+                        setSunset(dateRound15Minutes(selectedDate, sunset, true));
+                        break;
+
+                    default:
+                        setSunrise(dateRound60Minutes(selectedDate, sunrise, true));
+                        setSunset(dateRound60Minutes(selectedDate, sunset, true));
+                        break;
+                }
             } catch (error) {
                 console.error('Error fetching data', error);
             }
         };
 
         fetchData().catch(console.error);
-    }, [selectedDate]);
+    }, [selectedDate, selectedCountry]);
 
     const rechartsData = getDataPointPowerData(data);
     const rechartsKeys = getDataPointPowerKeys(data);
@@ -115,7 +157,7 @@ const PowerChart: React.FC<PowerChartProps> = ({ selectedDate, selectedCountry }
     return (
         <>
             <h2 className="title-2">Stromerzeugung {selectedCountryFormatted}, {selectedDateFormatted}</h2>
-            <p style={{textAlign: 'center'}}>Sonnenauf- und untergang: <a href="https://locate.place/location.html?q=51.1333%2C+10.4167&language=de&next_places=1" target="_blank" rel="noopener noreferrer">Länge: 51.1333°, Breite: 10.4167°</a> (Geometrischer Mittelpunkt von Deutschland)</p>
+            <p style={{textAlign: 'center'}}>Sonnenauf- und untergang: <a href={`https://locate.place/location.html?q=${latitude}%2C+${longitude}&language=de&next_places=1`} target="_blank" rel="noopener noreferrer">Länge: {latitude}°, Breite: {longitude}°</a> (Geometrischer Mittelpunkt von {name})</p>
             <ResponsiveContainer width="100%" height={600}>
                 <AreaChart data={rechartsData} margin={{top: 20, right: 30, left: 30, bottom: 0}}>
                     <CartesianGrid strokeDasharray="3 3" />

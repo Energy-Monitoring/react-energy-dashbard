@@ -70,7 +70,9 @@ export const chartConfigEnabled: {[key: string]: boolean} = {
     'Wind onshore': true,
 };
 
-export const chartConfigCollectOthersBelow = 1000;
+export const chartConfigCollectOthersBelowAbsolute = 1000;
+
+export const chartConfigCollectOthersBelowPercent = 2.5;
 
 export const chartConfigPercent: {[key: string]: boolean} = {
     'Biomass': false,

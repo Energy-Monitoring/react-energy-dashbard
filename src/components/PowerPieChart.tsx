@@ -44,12 +44,13 @@ const CustomTooltipPowerPie = ({ active, payload, label }: any) => {
 /**
  * Custom label for power pie chart.
  */
-let customLabelPowerPiePositionPrev = { x: 0, y: 0 }
+let customLabelPowerPiePositionPrev: {x: Number, y: Number}|null = null;
 let customLabelPowerPieLabelPrev: string[] = [];
 let customLabelPowerPieFillPrev: string[] = [];
 let CustomLabelPowerPie: React.FC<CustomLabelPowerPieProps> = ({ name, value, fill, cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
     const distanceToGraph = 20;
-    const distanceToLast = 26;
+    const distanceToLastX = 50;
+    const distanceToLastY = 26;
 
     const radian = Math.PI / 180;
     const radius = outerRadius + distanceToGraph;
@@ -59,7 +60,10 @@ let CustomLabelPowerPie: React.FC<CustomLabelPowerPieProps> = ({ name, value, fi
     const positionPrev = customLabelPowerPiePositionPrev;
     const label = unitEnergyFormatter(value, true, 'MW');
 
-    if (positionPrev && Math.abs(positionPrev.y - y) < distanceToLast) {
+    const distanceFarEnoughX = positionPrev === null ? true : (Math.abs(Number(positionPrev.x) - x) > distanceToLastX);
+    const distanceFarEnoughY = positionPrev === null ? true : (Math.abs(Number(positionPrev.y) - y) > distanceToLastY);
+
+    if (!distanceFarEnoughX && !distanceFarEnoughY) {
         customLabelPowerPieLabelPrev.push(label);
         customLabelPowerPieFillPrev.push(fill);
         return null;
@@ -124,15 +128,15 @@ const PowerPieChart: React.FC<PieChartProps> = ({ selectedDate, selectedCountry,
 
         fetchData().catch(console.error);
 
-        customLabelPowerPiePositionPrev = { x: 0, y: 0 };
+        customLabelPowerPiePositionPrev = null;
         customLabelPowerPieLabelPrev = [];
         customLabelPowerPieFillPrev = [];
-    }, []);
+    }, [selectedDate, selectedCountry]);
 
-    let title = `Stromerzeugung DE Durchschnitt, ${dateFormat(dateProduction, FORMAT_DATE_DE)}`;
+    let title = `Stromerzeugung ${selectedCountry.toUpperCase()} Durchschnitt, ${dateFormat(dateProduction, FORMAT_DATE_DE)}`;
 
     if (showLast) {
-        title = `Stromerzeugung DE aktuell, ${dateFormat(dateProduction, FORMAT_DATE_TIME_DE)} Uhr`;
+        title = `Stromerzeugung ${selectedCountry.toUpperCase()} aktuell, ${dateFormat(dateProduction, FORMAT_DATE_TIME_DE)} Uhr`;
     }
 
     return (

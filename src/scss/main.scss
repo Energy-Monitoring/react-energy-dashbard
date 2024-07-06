@@ -37,13 +37,47 @@ code {
         }
     }
 
+    .controls-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+
+        .date-picker-container {
+            margin-right: 20px;
+
+            input {
+                padding: 5px;
+                text-align: center;
+                font-size: 1rem;
+            }
+        }
+
+        .country-picker-container {
+            margin-right: 20px;
+
+            select {
+                padding: 5px;
+                font-size: 1rem;
+            }
+        }
+
+        .day-ahead-price-picker-container {
+            margin-right: 20px;
+
+            select {
+                padding: 5px;
+                font-size: 1rem;
+            }
+        }
+    }
+
     .chart-container {
         display: grid;
         gap: 16px;
         grid-template-columns: 1fr;
 
         .chart {
-            margin: 10px 0;
+            margin: 0;
             border: 1px solid #a0a0a0;
             border-radius: 5px;
             padding: 2em;
@@ -74,12 +108,6 @@ code {
 
     .info-container {
         margin-bottom: 5em;
-    }
-
-    .date-picker-container {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 20px;
     }
 }
 

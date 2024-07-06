@@ -3,9 +3,9 @@ import {
     chartConfigColorReferenceLinePriceAvg,
     chartConfigColorReferenceLinePriceMax,
     chartConfigColorReferenceLinePriceMin, chartConfigColors,
-    chartConfigEnabled, chartConfigCollectOthersBelow,
+    chartConfigEnabled, chartConfigCollectOthersBelowAbsolute,
     chartConfigNameCollect,
-    chartConfigTranslations
+    chartConfigTranslations, chartConfigCollectOthersBelowPercent
 } from "../config/chartConfig";
 import {dateFormat, FORMAT_HOUR_MINUTE} from "./dateHelper";
 import {Payload} from "recharts/types/component/DefaultLegendContent";
@@ -157,7 +157,7 @@ export const processDatePowerLast = (data: ApiPower): {
             return null;
         }
 
-        const collect = valueAverage < chartConfigCollectOthersBelow;
+        const collect = valueAverage < chartConfigCollectOthersBelowAbsolute;
 
         if (collect || name === chartConfigNameCollect) {
             otherValue += value;
@@ -207,7 +207,7 @@ export const processDatePowerAvg = (data: ApiPower): {
             return null;
         }
 
-        const collect = value < chartConfigCollectOthersBelow;
+        const collect = value < chartConfigCollectOthersBelowAbsolute;
 
         if (collect || name === chartConfigNameCollect) {
             otherValue += value;
@@ -253,6 +253,35 @@ export const getDatePowerAvgAll = (productionTypes: ProductionType[]): {
         data: dataAverage
     };
 };
+export const getDatePowerPercentageAll = (productionTypes: ProductionType[]): {
+    data: DataPointsKeyNumber,
+} => {
+    const sum: { [key: string]: number } = {};
+    let totalSum = 0;
+
+    productionTypes.forEach(production => {
+        if (!sum[production.name]) {
+            sum[production.name] = 0;
+        }
+        production.data.forEach(value => {
+            if (!chartConfigEnabled[production.name]) {
+                return;
+            }
+
+            sum[production.name] += value;
+            totalSum += value;
+        });
+    });
+
+    const dataPercentage: { [key: string]: number } = {};
+    Object.keys(sum).forEach(key => {
+        dataPercentage[key] = Math.round((sum[key] / totalSum) * 100 * 100) / 100;
+    });
+
+    return {
+        data: dataPercentage
+    };
+};
 export const getDataPointsPowerPiData = (dataPoints: DataPointsKeyNumber): DataPointPowerPie[] => {
     return Object.keys(dataPoints).map(key => {
         return {
@@ -275,7 +304,9 @@ export const processDatePower = (data: ApiPower): {
     const unixSeconds = data.unix_seconds;
     const productionTypes = data.production_types;
 
-    const { data: average } = getDatePowerAvgAll(productionTypes);
+    const { data: percent } = getDatePowerPercentageAll(productionTypes);
+
+    console.log(percent);
 
     let otherKeys: string[] = [];
 
@@ -292,7 +323,7 @@ export const processDatePower = (data: ApiPower): {
         productionTypes.forEach((type: ProductionType) => {
             const value = Number(type.data[index]);
             const name = type.name;
-            const valueAverage = Number(average[name]);
+            const valueAverage = Number(percent[name]);
 
             const enabled = chartConfigEnabled[name];
 
@@ -300,7 +331,7 @@ export const processDatePower = (data: ApiPower): {
                 return;
             }
 
-            const collect = valueAverage < chartConfigCollectOthersBelow;
+            const collect = valueAverage < chartConfigCollectOthersBelowPercent;
 
             if (collect || name === chartConfigNameCollect) {
                 otherValue += value;
