@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Changelogs
 
-### [0.1.0] - 2023-12-17
+### [0.1.1] - 2024-07-07
+
+* Adding data sources and repository links
+* Reducing the price font size for the price information in the BarCharts
+* Fixed endless loop for the price request
+
+### [0.1.0] - 2024-07-06
 
 * First version
 * Connection to the API https://energy-api.ixno.de/
