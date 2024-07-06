@@ -127,7 +127,7 @@ const PowerPieChart: React.FC<PieChartProps> = ({ selectedDate, selectedCountry,
         customLabelPowerPiePositionPrev = { x: 0, y: 0 };
         customLabelPowerPieLabelPrev = [];
         customLabelPowerPieFillPrev = [];
-    }, [dateProduction, selectedCountry, showLast]);
+    }, []);
 
     let title = `Stromerzeugung DE Durchschnitt, ${dateFormat(dateProduction, FORMAT_DATE_DE)}`;
 

@@ -39,8 +39,17 @@ const App: React.FC = () => {
                 </div>
             </div>
             <div className="info-container">
-                <p><strong>Quelle</strong>: <a href="https://api.energy-charts.info" target="_blank" rel="noopener noreferrer">https://api.energy-charts.info</a></p>
-                <p><strong>Quelle</strong>: <a href="https://api.sunrise-sunset.org" target="_blank" rel="noopener noreferrer">https://api.sunrise-sunset.org</a></p>
+                <h2>Quellen</h2>
+                <ul>
+                    <li><a href="https://api.energy-charts.info" target="_blank" rel="noopener noreferrer">https://api.energy-charts.info</a> (Energiedaten)</li>
+                    <li><a href="https://api.sunrise-sunset.org" target="_blank" rel="noopener noreferrer">https://api.sunrise-sunset.org</a> (Sonnenauf- und Untergangsdaten)</li>
+                </ul>
+
+                <h2>Repositories</h2>
+                <ul>
+                    <li><a href="https://github.com/energy-monitoring/react-energy-dashbard" target="_blank" rel="noopener noreferrer">https://github.com/energy-monitoring/react-energy-dashbard</a> (ReactJS Quellen)</li>
+                    <li><a href="https://github.com/energy-monitoring/docker-api-proxy" target="_blank" rel="noopener noreferrer">https://github.com/energy-monitoring/docker-api-proxy</a> (Docker API Proxy)</li>
+                </ul>
             </div>
         </div>
     );

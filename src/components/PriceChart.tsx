@@ -57,7 +57,7 @@ const CustomLabelBar = ({ viewBox, value }: { viewBox: any; value: number }) => 
     const posY = value < 0 ? y + 12 : y - 12;
 
     return (
-        <text x={posX} y={posY} fill={chartConfigColorText} textAnchor="middle" dominantBaseline="middle">
+        <text x={posX} y={posY} fill={chartConfigColorText} textAnchor="middle" dominantBaseline="middle" fontSize={12}>
             {priceEnergyFormatter(value, false)}
         </text>
     );
