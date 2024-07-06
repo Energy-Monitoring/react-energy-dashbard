@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Changelogs
 
+### [0.1.2] - 2024-07-07
+
+* Add power production country selector
+* Add day ahead price country selector
+* Adding the geographical centers to the countries
+
 ### [0.1.1] - 2024-07-07
 
 * Adding data sources and repository links
