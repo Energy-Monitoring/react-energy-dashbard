@@ -136,7 +136,7 @@ const PowerPieChart: React.FC<PieChartProps> = ({ selectedDate, selectedCountry,
     let title = `Stromerzeugung ${selectedCountry.toUpperCase()} Durchschnitt, ${dateFormat(selectedDate, FORMAT_DATE_DE)}`;
 
     if (showLast) {
-        title = `Stromerzeugung ${selectedCountry.toUpperCase()} aktuell, ${dateFormat(selectedDate, FORMAT_DATE_TIME_DE)} Uhr`;
+        title = `Stromerzeugung ${selectedCountry.toUpperCase()} aktuell, ${dateFormat(dateProduction, FORMAT_DATE_TIME_DE)} Uhr`;
     }
 
     return (
