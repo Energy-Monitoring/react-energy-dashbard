@@ -1,3 +1,9 @@
+[![Release](https://img.shields.io/github/v/release/energy-monitoring/react-energy-dashbard)](https://github.com/energy-monitoring/react-energy-dashbard/releases)
+[![](https://img.shields.io/github/release-date/energy-monitoring/react-energy-dashbard)](https://github.com/energy-monitoring/react-energy-dashbard/releases)
+![](https://img.shields.io/github/repo-size/energy-monitoring/react-energy-dashbard.svg)
+[![TypeScript](https://img.shields.io/badge/TypeScript-^4.9-555555.svg?logo=typescript&logoColor=white&labelColor=3178c6&style=flat)](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html)
+[![LICENSE](https://img.shields.io/github/license/energy-monitoring/react-energy-dashbard)](https://github.com/energy-monitoring/react-energy-dashbard/blob/master/LICENSE)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
