@@ -55,7 +55,7 @@ export const positions: {[key: string]: {latitude: number, longitude: number, na
     "de": { "latitude": 51.1333, "longitude": 10.4167, name: "Deutschland", distance: 15 },
     "ch": { "latitude": 46.8, "longitude": 8.2, name: "Schweiz", distance: 60 },
     "eu": { "latitude": 54.8985, "longitude": 25.3015, name: "Europa", distance: 60 },
-    "all": { "latitude": 47.2, "longitude": 13.2, name: "Österreich", distance: 60 },
+    "all": { "latitude": 47.2, "longitude": 13.2, name: "Europa", distance: 60 },
     "at": { "latitude": 47.2, "longitude": 13.2, name: "Österreich", distance: 15 },
     "be": { "latitude": 50.6403, "longitude": 4.6667, name: "Belgien", distance: 60 },
     "bg": { "latitude": 42.7833, "longitude": 25.2333, name: "Bulgarien", distance: 60 },
