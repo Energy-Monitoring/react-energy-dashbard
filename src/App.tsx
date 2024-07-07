@@ -68,16 +68,16 @@ const App: React.FC = () => {
             </div>
             <div className="chart-container">
                 <div className="chart">
-                    <PriceChart selectedDate={dateAddHours(selectedDate, -2)} selectedCountry={selectedCountryDAP}/>
+                    <PriceChart selectedDate={dateAddHours(selectedDate, 0)} selectedCountry={selectedCountryDAP}/>
                 </div>
                 <div className="chart">
-                    <PowerChart selectedDate={dateAddHours(selectedDate, -2)} selectedCountry={selectedCountry}/>
+                    <PowerChart selectedDate={dateAddHours(selectedDate, 0)} selectedCountry={selectedCountry}/>
                 </div>
                 <div className="chart">
-                    <PowerPieChart selectedDate={dateAddHours(selectedDate, -2)} selectedCountry={selectedCountry}/>
+                    <PowerPieChart selectedDate={dateAddHours(selectedDate, 0)} selectedCountry={selectedCountry}/>
                 </div>
                 <div className="chart">
-                    <PowerPieChart selectedDate={dateAddHours(dateToday(HOUR_00_00_00), -2)} selectedCountry={selectedCountry} showLast={true}/>
+                    <PowerPieChart selectedDate={dateAddHours(dateToday(HOUR_00_00_00), 0)} selectedCountry={selectedCountry} showLast={true}/>
                 </div>
             </div>
             <div className="info-container">

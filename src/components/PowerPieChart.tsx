@@ -103,8 +103,8 @@ const PowerPieChart: React.FC<PieChartProps> = ({ selectedDate, selectedCountry,
             try {
                 const powerApiUrl = process.env.REACT_APP_POWER_API_URL;
 
-                const dateFrom = dateISOWithTimeOffset(dateSetTime(dateProduction, HOUR_00_00_00));
-                const dateTo = dateISOWithTimeOffset(dateSetTime(dateProduction, HOUR_23_59_59));
+                const dateFrom = dateISOWithTimeOffset(dateSetTime(selectedDate, HOUR_00_00_00));
+                const dateTo = dateISOWithTimeOffset(dateSetTime(selectedDate, HOUR_23_59_59));
 
                 const response = await axios.get(`${powerApiUrl}?country=${selectedCountry}&start=${dateFrom}&end=${dateTo}`);
 
@@ -133,10 +133,10 @@ const PowerPieChart: React.FC<PieChartProps> = ({ selectedDate, selectedCountry,
         customLabelPowerPieFillPrev = [];
     }, [selectedDate, selectedCountry]);
 
-    let title = `Stromerzeugung ${selectedCountry.toUpperCase()} Durchschnitt, ${dateFormat(dateProduction, FORMAT_DATE_DE)}`;
+    let title = `Stromerzeugung ${selectedCountry.toUpperCase()} Durchschnitt, ${dateFormat(selectedDate, FORMAT_DATE_DE)}`;
 
     if (showLast) {
-        title = `Stromerzeugung ${selectedCountry.toUpperCase()} aktuell, ${dateFormat(dateProduction, FORMAT_DATE_TIME_DE)} Uhr`;
+        title = `Stromerzeugung ${selectedCountry.toUpperCase()} aktuell, ${dateFormat(selectedDate, FORMAT_DATE_TIME_DE)} Uhr`;
     }
 
     return (
