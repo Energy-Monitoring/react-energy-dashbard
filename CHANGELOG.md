@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Changelogs
 
+### [0.1.3] - 2024-07-07
+
+* Change title of the app, favicons, manifest and license
+* Optimize widths and position of input fields
+* Possibility to summarize small producers by percentage share instead of absolute numbers
+* Limit date selection to today and the past
+  Fix naming within countries
+
 ### [0.1.2] - 2024-07-07
 
 * Add power production country selector
