@@ -33,20 +33,26 @@ const App: React.FC = () => {
         setSelectedCountryDAP(event.target.value);
     };
 
+    const minDate = new Date('2020-01-01');
+    const maxDate = new Date();
+
     return (
         <div className="app-container">
             <h1 className="title-1">Übersicht</h1>
             <div className="controls-container">
                 <div className="date-picker-container">
-                    <strong>Datum</strong>:&nbsp;&nbsp;&nbsp;
+                    <strong>Datum</strong>:<br/>
                     <DatePicker
                         selected={selectedDate}
                         onChange={handleDateChange}
                         dateFormat="yyyy-MM-dd"
+                        minDate={minDate}
+                        maxDate={maxDate}
+                        popperPlacement={'bottom-end'}
                     />
                 </div>
                 <div className="day-ahead-price-picker-container">
-                    <strong>Day Ahead Preis</strong>:&nbsp;&nbsp;&nbsp;
+                    <strong>Day Ahead Preis</strong>:<br/>
                     <select value={selectedCountryDAP} onChange={handleDayAheadPriceChange}>
                         {countriesDayAheadPrice.map(price => (
                             <option key={price.code} value={price.code}>
@@ -56,7 +62,7 @@ const App: React.FC = () => {
                     </select>
                 </div>
                 <div className="country-picker-container">
-                    <strong>Stromerzeugung</strong>:&nbsp;&nbsp;&nbsp;
+                    <strong>Stromerzeugung</strong>:<br/>
                     <select value={selectedCountry} onChange={handleCountryChange}>
                         {countries.map(country => (
                             <option key={country.code} value={country.code}>
