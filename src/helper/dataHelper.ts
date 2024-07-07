@@ -136,7 +136,7 @@ export const processDatePowerLast = (data: ApiPower): {
     const unixSeconds = data.unix_seconds;
     const productionTypes = data.production_types;
 
-    const { data: average } = getDatePowerAvgAll(productionTypes);
+    const { data: average } = getDatePowerPercentageAll(productionTypes);
 
     const latestTimestamp = unixSeconds[unixSeconds.length - 1];
     const latestDate = new Date(latestTimestamp * 1000);
@@ -157,7 +157,7 @@ export const processDatePowerLast = (data: ApiPower): {
             return null;
         }
 
-        const collect = valueAverage < chartConfigCollectOthersBelowAbsolute;
+        const collect = valueAverage < chartConfigCollectOthersBelowPercent;
 
         if (collect || name === chartConfigNameCollect) {
             otherValue += value;
@@ -189,7 +189,7 @@ export const processDatePowerAvg = (data: ApiPower): {
 } => {
     const productionTypes = data.production_types;
 
-    const { data: average } = getDatePowerAvgAll(productionTypes);
+    const { data: average } = getDatePowerPercentageAll(productionTypes);
 
     let otherKeys: string[] = [];
 
@@ -207,7 +207,7 @@ export const processDatePowerAvg = (data: ApiPower): {
             return null;
         }
 
-        const collect = value < chartConfigCollectOthersBelowAbsolute;
+        const collect = value < chartConfigCollectOthersBelowPercent;
 
         if (collect || name === chartConfigNameCollect) {
             otherValue += value;
