@@ -115,7 +115,7 @@ const PriceChart: React.FC<PriceChartProps> = ({ selectedDate, selectedCountry }
                 <BarChart data={data} margin={{top: 20, right: 0, left: 30, bottom: 0}}>
                     <CartesianGrid strokeDasharray="3 3"/>
                     <XAxis dataKey="time" tick={chartConfigAxisTickStyle} ticks={['06:00', '12:00', '18:00']}/>
-                    <YAxis unit="" tick={chartConfigAxisTickStyle} ticks={[-10, -5, 0, 5, 10, 15, 20]}
+                    <YAxis unit="" tick={chartConfigAxisTickStyle} ticks={[0, 5, 10, 15, 20]}
                            domain={[priceMin > 0 ? 0 : priceMin - 1, priceMax + 1]} allowDataOverflow={true}/>
                     <Tooltip content={CustomTooltipPrice}/>
                     <Legend payload={getPriceLegendPayload(priceMax, priceAvg, priceMin)} />
