@@ -76,9 +76,9 @@ const App: React.FC = () => {
                 </div>
             </div>
             <div className="chart-container">
-                <div className="chart">
-                    <WorldMap country={selectedCountry} width={200} height={100}/>
-                </div>
+                {/*<div className="chart">*/}
+                {/*    <WorldMap country={selectedCountry} width={200} height={100}/>*/}
+                {/*</div>*/}
                 <div className="chart">
                     <PriceChart selectedDate={dateAddHours(selectedDate, 0)} selectedCountry={selectedCountryDAP}/>
                 </div>
@@ -92,9 +92,9 @@ const App: React.FC = () => {
                     <PowerPieChart selectedDate={dateAddHours(dateToday(HOUR_00_00_00), 0)}
                                    selectedCountry={selectedCountry} showLast={true}/>
                 </div>
-                {/*                <div className="chart">
+                <div className="chart">
                     <WorldMap country={selectedCountry} width={200} height={100}/>
-                </div>*/}
+                </div>
             </div>
             <div className="info-container">
                 <h2>Quellen</h2>
