@@ -48,6 +48,7 @@ export type TypeFeature = {
 };
 
 export interface InterfaceGeoJson extends FeatureCollection {
+    type: "FeatureCollection";
     citiesAdded?: boolean;
     features: TypeFeature[];
 }
