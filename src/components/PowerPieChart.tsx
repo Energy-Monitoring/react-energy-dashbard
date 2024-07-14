@@ -97,6 +97,7 @@ let CustomLabelPowerPie: React.FC<CustomLabelPowerPieProps> = ({ name, value, fi
 const PowerPieChart: React.FC<PieChartProps> = ({ selectedDate, selectedCountry, showLast = false }) => {
     const [dataProduction, setDataProduction] = useState<DataPointPowerPie[]>([]);
     const [dateProduction, setDateProduction] = useState<Date>(selectedDate);
+    const [apiSuccess, setApiSuccess] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -121,6 +122,8 @@ const PowerPieChart: React.FC<PieChartProps> = ({ selectedDate, selectedCountry,
                     ({ data } = processDatePowerAvg(response.data));
                     setDataProduction(getDataPointsPowerPiData(data));
                 }
+
+                setApiSuccess(true);
             } catch (error) {
                 console.error('Error fetching data', error);
             }
@@ -143,33 +146,40 @@ const PowerPieChart: React.FC<PieChartProps> = ({ selectedDate, selectedCountry,
         <>
             <h2 className="title-2">{title}</h2>
             <p>&nbsp;</p>
-            <ResponsiveContainer width="100%" height={600}>
-                <PieChart>
-                    <Tooltip content={CustomTooltipPowerPie} />
-                    <Legend />
-                    <Pie
-                        data={dataProduction}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={120}
-                        innerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={CustomLabelPowerPie}
-                    >
-                        {dataProduction.map((entry, index) => (
-                            <Cell
-                                key={`cell-${index}`}
-                                fill={chartConfigColors[entry.name]}
-                                name={chartConfigTranslations[entry.name]}
-                            />
-                        ))}
-                        <Label value="MW" position="center" fill={chartConfigColorText} fontSize={chartConfigYAxisFontSize} />
-                    </Pie>
+            {
+                apiSuccess ? (
+                    <ResponsiveContainer width="100%" height={600}>
+                        <PieChart>
+                            <Tooltip content={CustomTooltipPowerPie} />
+                            <Legend />
+                            <Pie
+                                data={dataProduction}
+                                cx="50%"
+                                cy="50%"
+                                labelLine={false}
+                                outerRadius={120}
+                                innerRadius={80}
+                                fill="#8884d8"
+                                dataKey="value"
+                                label={CustomLabelPowerPie}
+                            >
+                                {dataProduction.map((entry, index) => (
+                                    <Cell
+                                        key={`cell-${index}`}
+                                        fill={chartConfigColors[entry.name]}
+                                        name={chartConfigTranslations[entry.name]}
+                                    />
+                                ))}
+                                <Label value="MW" position="center" fill={chartConfigColorText} fontSize={chartConfigYAxisFontSize} />
+                            </Pie>
 
-                </PieChart>
-            </ResponsiveContainer>
+                        </PieChart>
+                    </ResponsiveContainer>
+                ) : (
+                    <p>Fehler beim Abrufen der API Daten. Oder noch keine Daten verfügbar.</p>
+                )
+            }
+
         </>
     );
 };
