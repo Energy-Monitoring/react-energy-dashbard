@@ -15,6 +15,7 @@ import {
     HOUR_12_00_00
 } from "./helper/dateHelper";
 import {countries, countriesDayAheadPrice} from "./config/countries";
+import WorldMap from "./components/WorldMap";
 
 const App: React.FC = () => {
     const [selectedDate, setSelectedDate] = useState<Date>(dateYesterday(HOUR_00_00_00));
@@ -83,7 +84,11 @@ const App: React.FC = () => {
                     <PowerPieChart selectedDate={dateAddHours(selectedDate, 0)} selectedCountry={selectedCountry}/>
                 </div>
                 <div className="chart">
-                    <PowerPieChart selectedDate={dateAddHours(dateToday(HOUR_00_00_00), 0)} selectedCountry={selectedCountry} showLast={true}/>
+                    <PowerPieChart selectedDate={dateAddHours(dateToday(HOUR_00_00_00), 0)}
+                                   selectedCountry={selectedCountry} showLast={true}/>
+                </div>
+                <div className="chart">
+                    <WorldMap country={selectedCountry} width={200} height={100}/>
                 </div>
             </div>
             <div className="info-container">
@@ -94,6 +99,9 @@ const App: React.FC = () => {
                     </li>
                     <li><a href="https://api.sunrise-sunset.org" target="_blank"
                            rel="noopener noreferrer">https://api.sunrise-sunset.org</a> (Sonnenauf- und Untergangsdaten)
+                    </li>
+                    <li><a href="https://geojson-maps.kyd.au" target="_blank"
+                           rel="noopener noreferrer">https://geojson-maps.kyd.au</a> (GeoJSON Data)
                     </li>
                 </ul>
 

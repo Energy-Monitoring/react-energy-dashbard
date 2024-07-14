@@ -1,4 +1,9 @@
-export const countries = [
+export type TypeCountry = {
+    code: string;
+    name: string;
+};
+
+export const countries: TypeCountry[] = [
     { code: "de", name: "Deutschland" },
     { code: "ch", name: "Schweiz" },
     { code: "eu", name: "Europäische Union" },
@@ -31,25 +36,28 @@ export const countries = [
     { code: "se", name: "Schweden" },
     { code: "sk", name: "Slowakische Republik" },
     { code: "xk", name: "Kosovo" },
+
+    // { code: "al", name: "Albania" },
+    // { code: "am", name: "Armenia" },
+    // { code: "az", name: "Azerbaijan" },
+    // { code: "ba", name: "Bosnia-Herzegovina" },
+    // { code: "by", name: "Belarus" },
+    // { code: "cy", name: "Cyprus" },
+    // { code: "it", name: "Italy" },
+    // { code: "md", name: "Moldova" },
+    // { code: "mt", name: "Malta" },
+    // { code: "nie", name: "North Ireland" },
+    // { code: "ru", name: "Russia" },
+    // { code: "sl", name: "Slovenia" },
+    // { code: "tr", name: "Turkey" },
+    // { code: "ua", name: "Ukraine" },
+    // { code: "uk", name: "United Kingdom" },
 ].sort((a, b) => a.name.localeCompare(b.name));
 
-// export const countries = [
-//     // { code: "al", name: "Albania" },
-//     // { code: "am", name: "Armenia" },
-//     // { code: "az", name: "Azerbaijan" },
-//     // { code: "ba", name: "Bosnia-Herzegovina" },
-//     // { code: "by", name: "Belarus" },
-//     // { code: "cy", name: "Cyprus" },
-//     // { code: "it", name: "Italy" },
-//     // { code: "md", name: "Moldova" },
-//     // { code: "mt", name: "Malta" },
-//     // { code: "nie", name: "North Ireland" },
-//     // { code: "ru", name: "Russia" },
-//     // { code: "sl", name: "Slovenia" },
-//     // { code: "tr", name: "Turkey" },
-//     // { code: "ua", name: "Ukraine" },
-//     // { code: "uk", name: "United Kingdom" },
-// ];
+export const countryMap = countries.reduce((map, country) => {
+    map[country.code] = country;
+    return map;
+}, {} as { [key: string]: TypeCountry });
 
 export const positions: {[key: string]: {latitude: number, longitude: number, name: string, distance: number}} = {
     "de": { "latitude": 51.1333, "longitude": 10.4167, name: "Deutschland", distance: 15 },
