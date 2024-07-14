@@ -12,8 +12,8 @@ import {
     dateYesterday,
     HOUR_00_00_00
 } from "./helper/dateHelper";
-import {countries, countriesDayAheadPrice} from "./libs/WordlMapSvg/config/countries";
 import WorldMap from "./components/WorldMap";
+import {countrySelections, countryDayAheadPrices} from "./data/countries";
 
 const App: React.FC = () => {
     const [selectedDate, setSelectedDate] = useState<Date>(dateYesterday(HOUR_00_00_00));
@@ -35,6 +35,19 @@ const App: React.FC = () => {
     const minDate = new Date('2020-01-01');
     const maxDate = new Date();
 
+    const getOptionColor = (priority: number): string => {
+        switch (priority) {
+            case 2:
+                return '#000080';
+            case 1:
+                return '#008000';
+            case 0:
+                return '#202020';
+            default:
+                return '#000000';
+        }
+    };
+
     return (
         <div className="app-container">
             <h1 className="title-1">Übersicht</h1>
@@ -53,23 +66,29 @@ const App: React.FC = () => {
                 <div className="day-ahead-price-picker-container">
                     <strong>Day Ahead Preis</strong>:<br/>
                     <select value={selectedCountryDAP} onChange={handleDayAheadPriceChange}>
-                        {countriesDayAheadPrice.map(price => (
-                            <option key={price.code} value={price.code}>
-                                {price.name}
-                            </option>
-                        ))}
+                        {
+                            countryDayAheadPrices.map(price => (
+                                <option key={price.code} value={price.code}>
+                                    {price.name}
+                                </option>
+                            ))
+                        }
                     </select>
                 </div>
                 <div className="country-picker-container">
                     <strong>Stromerzeugung</strong>:<br/>
                     <select value={selectedCountry} onChange={handleCountryChange}>
-                        {countries
-                            .filter(country => country.enabled)
-                            .map(country => (
-                            <option key={country.code} value={country.code}>
-                                {country.name}
-                            </option>
-                        ))}
+                        {
+                            countrySelections
+                                .filter(country => country.enabled)
+                                .sort((countryA, countryB) => countryA.name.localeCompare(countryB.name))
+                                .sort((countryA, countryB) => countryA.priority > countryB.priority ? -1 : 1)
+                                .map(country => (
+                                    <option key={country.code} value={country.code} style={{ color: getOptionColor(country.priority) }}>
+                                        {country.name}
+                                    </option>
+                                ))
+                        }
                     </select>
                 </div>
             </div>

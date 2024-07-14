@@ -19,7 +19,7 @@ import {
     getDataPointPowerKeys, getPowerLegendPayload,
     processDatePower, processSunriseSunset
 } from "../helper/dataHelper";
-import {positions} from "../libs/WordlMapSvg/config/countries";
+import {positions} from "../data/countries";
 
 interface PowerChartProps {
     selectedDate: Date;
