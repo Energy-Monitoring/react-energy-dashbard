@@ -49,6 +49,8 @@ const App: React.FC = () => {
         }
     };
 
+    const version = process.env.REACT_APP_VERSION;
+
     return (
         <div className="app-container">
             <h1 className="title-1">Übersicht</h1>
@@ -142,6 +144,9 @@ const App: React.FC = () => {
                         API Proxy)
                     </li>
                 </ul>
+            </div>
+            <div className="info-container">
+                <p style={{textAlign: "left"}}>Version: <a href="https://github.com/energy-monitoring/react-energy-dashbard/releases" target="_blank" rel="noopener noreferrer">{ version }</a></p>
             </div>
         </div>
     );

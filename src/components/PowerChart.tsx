@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, ReferenceLine } from 'recharts';
-import { chartConfigColors, chartConfigTranslations, chartConfigEnabled, chartConfigColorText, chartConfigYAxisPositionX, chartConfigYAxisPositionY, chartConfigYAxisFontSize, chartConfigAxisTickStyle} from '../config/chartConfig';
+import { chartConfigColors, chartConfigTranslations, chartConfigColorText, chartConfigYAxisPositionX, chartConfigYAxisPositionY, chartConfigYAxisFontSize, chartConfigAxisTickStyle} from '../config/chartConfig';
 import {
     dateFormat,
     dateISOWithTimeOffset,
