@@ -1,3 +1,5 @@
+export const zoomCountry: boolean = true;
+
 export const chartConfigColors: {[key: string]: string} = {
     'Biomass': '#8884d8',
     'Cross border electricity trading': '#d88884',

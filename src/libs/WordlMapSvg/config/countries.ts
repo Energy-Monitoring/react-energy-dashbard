@@ -46,6 +46,7 @@ export const countries: TypeCountry[] = [
     { enabled: false, code: "ba", name: "Bosnien-Herzegowina" },
     { enabled: false, code: "by", name: "Weißrussland" },
     { enabled: false, code: "cy", name: "Zypern" },
+    { enabled: false, code: "gb", name: "Vereinigtes Königreich" },
     { enabled: false, code: "is", name: "Island" },
     { enabled: false, code: "it", name: "Italien" },
     { enabled: false, code: "li", name: "Lichtenstein" },
@@ -56,7 +57,6 @@ export const countries: TypeCountry[] = [
     { enabled: false, code: "sl", name: "Slowenien" },
     { enabled: false, code: "tr", name: "Türkei" },
     { enabled: false, code: "ua", name: "Ukraine" },
-    { enabled: false, code: "uk", name: "Vereinigtes Königreich" },
 
 ].sort((a, b) => a.name.localeCompare(b.name));
 

@@ -6,15 +6,13 @@ import PriceChart from "./components/PriceChart";
 import PowerChart from "./components/PowerChart";
 import PowerPieChart from "./components/PowerPieChart";
 import {
-    dateAddDays,
     dateAddHours,
     dateSetTime,
     dateToday,
     dateYesterday,
-    HOUR_00_00_00,
-    HOUR_12_00_00
+    HOUR_00_00_00
 } from "./helper/dateHelper";
-import {countries, countriesDayAheadPrice} from "./config/countries";
+import {countries, countriesDayAheadPrice} from "./libs/WordlMapSvg/config/countries";
 import WorldMap from "./components/WorldMap";
 
 const App: React.FC = () => {
@@ -93,7 +91,7 @@ const App: React.FC = () => {
                                    selectedCountry={selectedCountry} showLast={true}/>
                 </div>
                 <div className="chart">
-                    <WorldMap country={selectedCountry} width={200} height={100}/>
+                    <WorldMap country={selectedCountry} width={200} height={110}/>
                 </div>
             </div>
             <div className="info-container">

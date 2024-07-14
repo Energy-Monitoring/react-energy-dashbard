@@ -1,10 +1,13 @@
-import {TypeGeoJson} from "../helper/wordMapHelper";
+import {InterfaceGeoJson} from "../types/types";
 
 /**
  * Downloaded from: https://geojson-maps.kyd.au/
  * Resolution: 110 metre
+ *
+ * A small geojson object with the countries of the world intended for particularly responsive websites. Less suitable
+ * for zooming into the map, etc. Very suitable for displaying the world as a whole.
  */
-export const countriesDataLow: TypeGeoJson = {
+export const countriesDataLow: InterfaceGeoJson = {
     "type": "FeatureCollection", "features": [{
         "type": "Feature", "properties": {
             "featurecla": "Admin-0 country",

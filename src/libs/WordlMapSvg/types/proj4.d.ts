@@ -2,7 +2,7 @@
  * TypeScript declaration file to include proj4 in Typescript
  */
 declare module 'proj4' {
-    import { TypePoint } from "../helper/wordMapHelper";
+    import { TypePoint } from "./types";
 
     type TemplateCoordinates = TypePoint | [number, number, number] | [number, number, number, number];
 

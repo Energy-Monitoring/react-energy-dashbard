@@ -1,6 +1,12 @@
-import {TypeGeoJson} from "../helper/wordMapHelper";
+import {InterfaceGeoJson} from "../types/types";
 
-export const countriesDataTiny: TypeGeoJson = {
+/**
+ * Downloaded from: https://gist.github.com/markmarkoh/2969317
+ *
+ * A tiny geo-json object from the countries of the world intended for development or particularly responsive websites.
+ * Not suitable for zooming into the map, etc.
+ */
+export const countriesDataTiny: InterfaceGeoJson = {
     "type": "FeatureCollection", "features": [
         {
             "type": "Feature",

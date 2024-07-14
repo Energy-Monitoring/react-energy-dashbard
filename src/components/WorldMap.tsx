@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import SVGRenderer from "./SVGRenderer";
-import { WorldMapSvg, TypeDataSource } from "../helper/wordMapHelper";
-import { TypeCountry } from "../config/countries";
+import { TypeCountry } from "../libs/WordlMapSvg/config/countries";
+import { WorldMapSvg } from "../libs/WordlMapSvg/WorldMapSvg";
+import {TypeDataSource} from "../libs/WordlMapSvg/types/types";
+import {zoomCountry} from "../config/chartConfig";
 
-/**
- * PriceChart Interface
- */
 interface WorldMapProps {
     country: string|null;
     width: number;
     height: number;
 }
 
-const zoomCountry = true;
-
 /**
  * WorldMap component.
+ *
+ * @author Björn Hempel <bjoern@hempel.li>
+ * @version 0.1.0 (2024-07-14)
+ * @since 0.1.0 (2024-07-14) First version.
  */
 const WorldMap: React.FC<WorldMapProps> = ({
     country, width, height
@@ -24,7 +25,9 @@ const WorldMap: React.FC<WorldMapProps> = ({
     const [svgContent, setSvgContent] = useState<string[]>([]);
     const [translation, setTranslation] = useState<TypeCountry | null>(null);
 
-    const worldMapSvg = new WorldMapSvg(country);
+    const worldMapSvg = new WorldMapSvg({
+        country, width, height, zoomCountry
+    });
 
     useEffect(() => {
         worldMapSvg.setDataSource(dataSource);
@@ -35,7 +38,18 @@ const WorldMap: React.FC<WorldMapProps> = ({
 
     return (
         <>
-            <h1>Weltkarte</h1>
+            <h2 className="title-2">Weltkarte</h2>
+            <p>Ausgewähltes Land oder Bereich.</p>
+            <div className="svg">
+                <div className="svg-title">
+                    {translation ? `Karte von "${translation.name}"` : 'Weltkarte'}
+                </div>
+                <div className="copyright">
+                    WorldMapSvg build by <a href="https://www.hempel.li/" target="_blank"
+                                            rel="noopener noreferrer">bjoern hempel</a>
+                </div>
+                <SVGRenderer svgContent={svgContent} width={width} height={height}/>
+            </div>
             <div className="panel-switcher">
                 <strong>Auflösung</strong>:
                 <label>
@@ -56,16 +70,6 @@ const WorldMap: React.FC<WorldMapProps> = ({
                     />
                     Medium
                 </label>
-            </div>
-            <div className="svg">
-                <div className="svg-title">
-                    {translation ? `Karte von ${translation.name}` : 'Weltkarte'}
-                </div>
-                <div className="copyright">
-                    WorldMapSvg build by <a href="https://www.hempel.li/" target="_blank"
-                                    rel="noopener noreferrer">bjoern hempel</a>
-                </div>
-                <SVGRenderer svgContent={svgContent}/>
             </div>
         </>
     );

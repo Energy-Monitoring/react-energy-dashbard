@@ -19,7 +19,7 @@ import {
     getDataPointPowerKeys, getPowerLegendPayload,
     processDatePower, processSunriseSunset
 } from "../helper/dataHelper";
-import {positions} from "../config/countries";
+import {positions} from "../libs/WordlMapSvg/config/countries";
 
 interface PowerChartProps {
     selectedDate: Date;
@@ -157,7 +157,7 @@ const PowerChart: React.FC<PowerChartProps> = ({ selectedDate, selectedCountry})
     return (
         <>
             <h2 className="title-2">Stromerzeugung {selectedCountryFormatted}, {selectedDateFormatted}</h2>
-            <p style={{textAlign: 'center'}}>Sonnenauf- und untergang: <a href={`https://locate.place/location.html?q=${latitude}%2C+${longitude}&language=de&next_places=1`} target="_blank" rel="noopener noreferrer">Länge: {latitude}°, Breite: {longitude}°</a> (Geometrischer Mittelpunkt von {name})</p>
+            <p>Sonnenauf- und untergang: <a href={`https://locate.place/location.html?q=${latitude}%2C+${longitude}&language=de&next_places=1`} target="_blank" rel="noopener noreferrer">Länge: {latitude}°, Breite: {longitude}°</a> (Geometrischer Mittelpunkt von {name})</p>
             <ResponsiveContainer width="100%" height={600}>
                 <AreaChart data={rechartsData} margin={{top: 20, right: 30, left: 30, bottom: 0}}>
                     <CartesianGrid strokeDasharray="3 3" />
