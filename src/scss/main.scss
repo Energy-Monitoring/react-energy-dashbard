@@ -108,6 +108,20 @@ code {
                     font-weight: bold;
                 }
 
+                div.copyright {
+                    position: absolute;
+                    right: 0;
+                    bottom: 0;
+                    background-color: rgba(255, 255, 255, 0.5);
+                    border-top-left-radius: 8px;
+                    border-bottom-right-radius: 8px;
+                    padding: 8px 20px;
+                    border-left: 1px solid #a0a0a0;
+                    border-top: 1px solid #a0a0a0;
+                    font-style: italic;
+                    font-size: 0.8em;
+                }
+
                 svg {
                     padding: 0;
                     margin: 0;

@@ -61,6 +61,10 @@ const WorldMap: React.FC<WorldMapProps> = ({
                 <div className="svg-title">
                     {translation ? `Karte von ${translation.name}` : 'Weltkarte'}
                 </div>
+                <div className="copyright">
+                    WorldMapSvg build by <a href="https://www.hempel.li/" target="_blank"
+                                    rel="noopener noreferrer">bjoern hempel</a>
+                </div>
                 <SVGRenderer svgContent={svgContent}/>
             </div>
         </>
