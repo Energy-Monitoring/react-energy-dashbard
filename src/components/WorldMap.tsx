@@ -29,7 +29,7 @@ const WorldMap: React.FC<WorldMapProps> = ({
     useEffect(() => {
         worldMapSvg.setDataSource(dataSource);
         worldMapSvg.setCountry(country);
-        setSvgContent(worldMapSvg.getSvgPaths());
+        setSvgContent(worldMapSvg.renderSvgPaths());
         setTranslation(worldMapSvg.getTranslation());
     }, [dataSource, country]);
 

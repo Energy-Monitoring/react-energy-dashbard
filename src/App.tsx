@@ -65,7 +65,9 @@ const App: React.FC = () => {
                 <div className="country-picker-container">
                     <strong>Stromerzeugung</strong>:<br/>
                     <select value={selectedCountry} onChange={handleCountryChange}>
-                        {countries.map(country => (
+                        {countries
+                            .filter(country => country.enabled)
+                            .map(country => (
                             <option key={country.code} value={country.code}>
                                 {country.name}
                             </option>

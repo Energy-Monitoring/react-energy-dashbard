@@ -59,6 +59,7 @@ export type TypeGeometry = TypePointGeometry|TypePolygonGeometry|TypeLineStringG
 export type TypeFeature = {
     type: "Feature";
     id?: string;
+    name?: string;
     geometry: TypeGeometry;
     properties: TypeProperties;
 };
@@ -429,10 +430,22 @@ export const centerBoundingBox = (
 
 export const calculateIds = (geoJson: TypeGeoJson): TypeGeoJson => {
     const convertedFeatures = geoJson.features.map(feature => {
-        return {
+        let id = getId(feature);
+
+        let convertedFeature = {
             ...feature,
-            id: getId(feature)
+            id: id
         };
+
+        const country = id.toLowerCase();
+
+        if (!countryMap.hasOwnProperty(country)) {
+            return convertedFeature;
+        }
+
+        convertedFeature.name = countryMap[country].name;
+
+        return convertedFeature;
     });
 
     return {
@@ -498,6 +511,7 @@ export const getFeatureFromCity = (city: TypeCity): TypeFeature => {
             fill: "#008000",
             "stroke-width": 0
         },
+        name: city.name,
         id: `Place-${city.name}`
     };
 }
@@ -625,6 +639,9 @@ export const convertCoordinates = (coords: TypePoint): TypePoint => {
     return proj4(proj4326, proj3857, coords);
 };
 
+/**
+ * Class WorldMapSvg.
+ */
 export class WorldMapSvg {
 
     private country: string|null;
@@ -682,6 +699,11 @@ export class WorldMapSvg {
         }
     }
 
+    /**
+     * Set country.
+     *
+     * @param country
+     */
     public setCountry(country: string|null): void {
         this.country = country;
         this.countryKey = this.country !== null ? this.country.toUpperCase() : null;
@@ -691,18 +713,19 @@ export class WorldMapSvg {
         }
     }
 
+    /**
+     * Set data source.
+     *
+     * @param dataSource
+     */
     public setDataSource(dataSource: TypeDataSource): void {
         this.dataSource = dataSource;
-
-        console.log(this.dataSource);
 
         this.data = prepareGeoJsonData(this.dataSource === 'low' ?
             countriesDataLow :
             countriesDataMedium,
             this.countryKey
         );
-
-        console.log(this.data);
 
         this.dataIdMap = transformGeoJsonToFeatureMap(this.data);
 
@@ -711,7 +734,20 @@ export class WorldMapSvg {
         }
     }
 
-    public getSvgPaths(): string[] {
+    private addTitlesToSvgElements(svgElements: string[], features: TypeFeature[]): string[] {
+        return svgElements.map((svgElement, index) => {
+            const feature = features[index];
+            const title = feature.name || 'Not specified';
+            const titleElement = `<title>${title}</title>`;
+            svgElement = svgElement.replace(/\/>/, `>${titleElement}</path>`);
+            return svgElement;
+        });
+    };
+
+    /**
+     * Renders the svg paths.
+     */
+    public renderSvgPaths(): string[] {
         this.boundingType = getBoundingType(this.country, this.countryKey, this.zoomCountry);
 
         let boundingBox = calculateBoundingBoxEmpty();
@@ -756,7 +792,7 @@ export class WorldMapSvg {
             r: getPointSizeByBoundingBox(boundingBox, this.boundingType)
         });
 
-        return converter.convert(this.data);
+        return this.addTitlesToSvgElements(converter.convert(this.data), this.data.features);
     }
 
     public getTranslation(): TypeCountry|null {
