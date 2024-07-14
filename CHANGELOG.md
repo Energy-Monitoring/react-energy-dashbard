@@ -7,13 +7,31 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Changelogs
 
+### [0.1.4] - 2024-07-15
+
+* Add the error message to missing data
+* Add the type to InterfaceGeoJson
+* Add the table overview of the generation of energy.
+* Refactoring WorldMapSvg
+  * move to src/lib/WorldMapSvg
+  * Distribute many methods to BoundingBox, CoordinateConverter, DataConverter and GeometryChecker
+  * Add GeoJson type @types/geojson to project
+* Add copyrights to map
+* Add the country map to the end of the chart list
+* Add titles to all countries and cities
+* Refactoring worldMapHelper
+  * Add the first version of class WorldMapSvg
+* Add world and country map as svg image
+  * Available sizes: Tiny, Low and Medium
+* Add the price range to 0, 5, 10, 15, 20
+
 ### [0.1.3] - 2024-07-07
 
 * Change title of the app, favicons, manifest and license
 * Optimize widths and position of input fields
 * Possibility to summarize small producers by percentage share instead of absolute numbers
-* Limit date selection to today and the past
-  Fix naming within countries
+* Limit date selection to today and the past 
+* Fix naming within countries
 
 ### [0.1.2] - 2024-07-07
 
