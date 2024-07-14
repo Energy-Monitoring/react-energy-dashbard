@@ -1,6 +1,6 @@
-import {GeoJson} from "../helper/wordMapHelper";
+import {TypeGeoJson} from "../helper/wordMapHelper";
 
-export const countriesDataTiny: GeoJson = {
+export const countriesDataTiny: TypeGeoJson = {
     "type": "FeatureCollection", "features": [
         {
             "type": "Feature",

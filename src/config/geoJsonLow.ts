@@ -1,10 +1,10 @@
-import {GeoJson} from "../helper/wordMapHelper";
+import {TypeGeoJson} from "../helper/wordMapHelper";
 
 /**
  * Downloaded from: https://geojson-maps.kyd.au/
  * Resolution: 110 metre
  */
-export const countriesDataLow: GeoJson = {
+export const countriesDataLow: TypeGeoJson = {
     "type": "FeatureCollection", "features": [{
         "type": "Feature", "properties": {
             "featurecla": "Admin-0 country",

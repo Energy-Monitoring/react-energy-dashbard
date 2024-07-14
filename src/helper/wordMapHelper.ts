@@ -1,5 +1,9 @@
 import proj4 from 'proj4';
 import {cities, TypeCity} from "../config/cities";
+import {countriesDataLow} from "../config/geoJsonLow";
+import {countriesDataMedium} from "../config/geoJsonMedium";
+import {countryMap, TypeCountry} from "../config/countries";
+import {GeoJSON2SVG} from "geojson2svg";
 
 export const zoomGapBoundingBoxLongitudeFactor = .2;
 
@@ -59,7 +63,7 @@ export type TypeFeature = {
     properties: TypeProperties;
 };
 
-export type GeoJson = {
+export type TypeGeoJson = {
     type: "FeatureCollection";
     citiesAdded?: boolean;
     features: TypeFeature[];
@@ -76,7 +80,9 @@ export type TypeBoundingBox = {
     latitudeMax: number;
 };
 
-export type TypeBoundingType = "country"|"all"|"eu";
+export type TypeBoundingBoxType = 'country' | 'all' | 'eu';
+
+export type TypeDataSource = 'low' | 'medium';
 
 export const boundingBoxEuProj4326: TypeBoundingBox = {
     longitudeMin: -31.266001,
@@ -126,7 +132,7 @@ export const isTypeMultiPolygonGeometry = (geometry: TypeGeometry): geometry is 
  *
  * @param geoJson
  */
-export const transformGeoJsonToFeatureMap = (geoJson: GeoJson): TypeFeatureMap => {
+export const transformGeoJsonToFeatureMap = (geoJson: TypeGeoJson): TypeFeatureMap => {
     const countryMap: TypeFeatureMap = {};
 
     geoJson.features.forEach(feature => {
@@ -421,7 +427,7 @@ export const centerBoundingBox = (
     };
 }
 
-export const calculateIds = (geoJson: GeoJson): GeoJson => {
+export const calculateIds = (geoJson: TypeGeoJson): TypeGeoJson => {
     const convertedFeatures = geoJson.features.map(feature => {
         return {
             ...feature,
@@ -435,7 +441,7 @@ export const calculateIds = (geoJson: GeoJson): GeoJson => {
     };
 }
 
-export const calculateMercator = (geoJson: GeoJson): GeoJson => {
+export const calculateMercator = (geoJson: TypeGeoJson): TypeGeoJson => {
     const convertedFeatures = geoJson.features.map(feature => {
         return {
             ...feature,
@@ -455,7 +461,7 @@ export const calculateMercator = (geoJson: GeoJson): GeoJson => {
  * @param geoJson
  * @param country
  */
-export const addConfigToCountry = (geoJson: GeoJson, country: string|null): GeoJson => {
+export const addConfigToCountry = (geoJson: TypeGeoJson, country: string|null): TypeGeoJson => {
     const convertedFeatures = geoJson.features.map(feature => {
         let properties = {
             ...feature.properties
@@ -489,7 +495,7 @@ export const getFeatureFromCity = (city: TypeCity): TypeFeature => {
         },
         properties: {
             name: city.name,
-            fill: "#808080",
+            fill: "#008000",
             "stroke-width": 0
         },
         id: `Place-${city.name}`
@@ -501,7 +507,7 @@ export const getFeatureFromCity = (city: TypeCity): TypeFeature => {
  *
  * @param geoJson
  */
-export const addCities = (geoJson: GeoJson): GeoJson => {
+export const addCities = (geoJson: TypeGeoJson): TypeGeoJson => {
     if (geoJson.citiesAdded) {
         return geoJson;
     }
@@ -521,7 +527,7 @@ export const addCities = (geoJson: GeoJson): GeoJson => {
  * @param geoJson
  * @param country
  */
-export const prepareGeoJsonData = (geoJson: GeoJson, country: string|null): GeoJson => {
+export const prepareGeoJsonData = (geoJson: TypeGeoJson, country: string|null): TypeGeoJson => {
     return addConfigToCountry(
         calculateIds(
             calculateMercator(
@@ -590,20 +596,20 @@ export const calculateMercatorFromMultiPolygon = (geometry: TypeMultiPolygonGeom
     };
 }
 
-export const getPointSizeByBoundingBox = (boundingBox: TypeBoundingBox, boundingType: TypeBoundingType): number => {
+export const getPointSizeByBoundingBox = (boundingBox: TypeBoundingBox, boundingType: TypeBoundingBoxType): number => {
 
     if (boundingType === 'all') {
-        return .2;
+        return .4;
     }
 
     if (boundingType === 'eu') {
-        return .2;
+        return .4;
     }
 
     return .8;
 }
 
-export const getBoundingType = (countryGiven: string|null, countryKey: string|null, zoomCountry: boolean): TypeBoundingType => {
+export const getBoundingType = (countryGiven: string|null, countryKey: string|null, zoomCountry: boolean): TypeBoundingBoxType => {
     if (!zoomCountry || countryGiven === 'all') {
         return 'all';
     }
@@ -615,6 +621,157 @@ export const getBoundingType = (countryGiven: string|null, countryKey: string|nu
     return 'country';
 }
 
-const convertCoordinates = (coords: TypePoint): TypePoint => {
+export const convertCoordinates = (coords: TypePoint): TypePoint => {
     return proj4(proj4326, proj3857, coords);
 };
+
+export class WorldMapSvg {
+
+    private country: string|null;
+
+    private countryKey: string|null;
+
+    private readonly width: number;
+
+    private readonly height: number;
+
+    private readonly zoomCountry: boolean;
+
+    private dataSource: TypeDataSource = 'low';
+
+    private data: TypeGeoJson;
+
+    private dataIdMap: TypeFeatureMap;
+
+    private boundingType: TypeBoundingBoxType = 'all';
+
+    /**
+     * The constructor of WorldMapSvg.
+     *
+     * @param country
+     * @param width
+     * @param height
+     * @param dataSource
+     * @param zoomCountry
+     */
+    constructor(
+        country: string|null = null,
+        width: number = 200,
+        height: number = 100,
+        dataSource: TypeDataSource = 'low',
+        zoomCountry: boolean = true
+    ) {
+        this.country = country;
+        this.width = width;
+        this.height = height;
+        this.zoomCountry = zoomCountry;
+        this.dataSource = dataSource;
+
+        this.countryKey = this.country !== null ? this.country.toUpperCase() : null;
+
+        this.data = prepareGeoJsonData(this.dataSource === 'low' ?
+            countriesDataLow :
+            countriesDataMedium,
+            this.countryKey
+        );
+
+        this.dataIdMap = transformGeoJsonToFeatureMap(this.data);
+
+        if (this.countryKey !== null && !this.dataIdMap.hasOwnProperty(this.countryKey)) {
+            this.countryKey = null;
+        }
+    }
+
+    public setCountry(country: string|null): void {
+        this.country = country;
+        this.countryKey = this.country !== null ? this.country.toUpperCase() : null;
+
+        if (this.countryKey !== null && !this.dataIdMap.hasOwnProperty(this.countryKey)) {
+            this.countryKey = null;
+        }
+    }
+
+    public setDataSource(dataSource: TypeDataSource): void {
+        this.dataSource = dataSource;
+
+        console.log(this.dataSource);
+
+        this.data = prepareGeoJsonData(this.dataSource === 'low' ?
+            countriesDataLow :
+            countriesDataMedium,
+            this.countryKey
+        );
+
+        console.log(this.data);
+
+        this.dataIdMap = transformGeoJsonToFeatureMap(this.data);
+
+        if (this.countryKey !== null && !this.dataIdMap.hasOwnProperty(this.countryKey)) {
+            this.countryKey = null;
+        }
+    }
+
+    public getSvgPaths(): string[] {
+        this.boundingType = getBoundingType(this.country, this.countryKey, this.zoomCountry);
+
+        let boundingBox = calculateBoundingBoxEmpty();
+
+        switch (this.boundingType) {
+            case "all":
+                boundingBox = calculateBoundingBoxAll(this.dataIdMap);
+                break;
+
+            case "eu":
+                boundingBox = calculateBoundingBoxEu();
+                break;
+
+            case "country":
+                if (this.countryKey === null) {
+                    throw new Error('Unsupported case. Country must not be null.');
+                }
+
+                boundingBox = calculateBoundingBox(this.dataIdMap[this.countryKey]);
+        }
+
+        /* Centers the bounding box to output svg. */
+        boundingBox = centerBoundingBox(
+            boundingBox,
+            this.width,
+            this.height,
+            this.boundingType === 'country' ? zoomGapBoundingBoxLongitudeFactor : zoomGapBoundingBoxLongitudeFactorAll,
+            this.boundingType === 'country' ? zoomGapBoundingBoxLatitudeFactor : zoomGapBoundingBoxLatitudeFactorAll,
+        );
+
+        const converter: GeoJSON2SVG = new GeoJSON2SVG({
+            mapExtent: { left: boundingBox.longitudeMin, bottom: boundingBox.latitudeMin, right: boundingBox.longitudeMax, top: boundingBox.latitudeMax },
+            viewportSize: { width: this.width, height: this.height },
+            attributes: [
+                {property: 'fill', type: 'static', value: '#d0d0d0'},
+                {property: 'stroke', type: 'static', value: '#a0a0a0'},
+                {property: 'stroke-width', type: 'static', value: '0.1'},
+                {property: 'properties.fill', type: 'dynamic'},
+                {property: 'properties.stroke', type: 'dynamic'},
+                {property: 'properties.stroke-width', type: 'dynamic'}
+            ],
+            r: getPointSizeByBoundingBox(boundingBox, this.boundingType)
+        });
+
+        return converter.convert(this.data);
+    }
+
+    public getTranslation(): TypeCountry|null {
+        if (this.country !== null  && this.country === 'eu' && countryMap.hasOwnProperty(this.country.toLowerCase())) {
+            return countryMap[this.country.toLowerCase()];
+        }
+
+        if (this.countryKey === null) {
+            return null;
+        }
+
+        if (!countryMap.hasOwnProperty(this.countryKey.toLowerCase())) {
+            return null;
+        }
+
+        return countryMap[this.countryKey.toLowerCase()];
+    }
+}
