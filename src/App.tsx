@@ -14,6 +14,7 @@ import {
 } from "./helper/dateHelper";
 import WorldMap from "./components/WorldMap";
 import {countrySelections, countryDayAheadPrices} from "./data/countries";
+import Table from "./components/Table";
 
 const App: React.FC = () => {
     const [selectedDate, setSelectedDate] = useState<Date>(dateYesterday(HOUR_00_00_00));
@@ -111,6 +112,9 @@ const App: React.FC = () => {
                 </div>
                 <div className="chart">
                     <WorldMap country={selectedCountry} width={200} height={110}/>
+                </div>
+                <div className="chart">
+                    <Table/>
                 </div>
             </div>
             <div className="info-container">

@@ -45,13 +45,22 @@ const WorldMap: React.FC<WorldMapProps> = ({
                     {translation ? `Karte von "${translation.name}"` : 'Weltkarte'}
                 </div>
                 <div className="copyright">
-                    WorldMapSvg build by <a href="https://www.hempel.li/" target="_blank"
+                    <strong>WorldMapSvg</strong> build by <a href="https://www.hempel.li/" target="_blank"
                                             rel="noopener noreferrer">bjoern hempel</a>
                 </div>
                 <SVGRenderer svgContent={svgContent} width={width} height={height}/>
             </div>
             <div className="panel-switcher">
                 <strong>Auflösung</strong>:
+                <label>
+                    <input
+                        type="radio"
+                        value="tiny"
+                        checked={dataSource === 'tiny'}
+                        onChange={() => setDataSource('tiny')}
+                    />
+                    Tiny
+                </label>
                 <label>
                     <input
                         type="radio"

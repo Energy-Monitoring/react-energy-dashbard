@@ -4,6 +4,7 @@ import {cities, TypeCity} from "../config/cities";
 import {CoordinateConverter} from "./CoordinateConverter";
 import {countriesDataLow} from "../data/geoJsonLow";
 import {countriesDataMedium} from "../data/geoJsonMedium";
+import {countriesDataTiny} from "../data/geoJsonTiny";
 
 interface DataConverterOptions {
 
@@ -195,6 +196,10 @@ export class DataConverter {
      * @private
      */
     getPreparedData(dataSource: TypeDataSource, countryKey: TypeCountryKey): InterfaceGeoJson {
+        if (dataSource === 'tiny') {
+            return this.prepareGeoJsonData(countriesDataTiny, countryKey);
+        }
+
         if (dataSource === 'low') {
             return this.prepareGeoJsonData(countriesDataLow, countryKey);
         }
