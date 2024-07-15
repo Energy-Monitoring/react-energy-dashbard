@@ -94,6 +94,16 @@ code {
         }
     }
 
+
+    svg {
+        path.country:hover {
+            fill: #b0d0b0;
+        }
+        path.place:hover {
+            stroke-width: 2px;
+        }
+    }
+
     .controls-container {
         display: flex;
         align-items: center;

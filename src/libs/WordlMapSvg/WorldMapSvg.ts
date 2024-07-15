@@ -203,7 +203,8 @@ export class WorldMapSvg {
                 /* Use colors and properties if given within geoJson data. */
                 {property: 'properties.fill', type: 'dynamic'},
                 {property: 'properties.stroke', type: 'dynamic'},
-                {property: 'properties.stroke-width', type: 'dynamic'}
+                {property: 'properties.stroke-width', type: 'dynamic'},
+                {property: 'properties.class', type: 'dynamic'}
             ],
             r: this.boundingBox.getPointSizeByBoundingBox(boundingBox, boundingType)
         });

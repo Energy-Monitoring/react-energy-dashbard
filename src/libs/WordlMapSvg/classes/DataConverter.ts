@@ -127,6 +127,23 @@ export class DataConverter {
     }
 
     /**
+     * Adds ids and names to geoJson object.
+     *
+     * @param geoJson
+     * @private
+     */
+    private addCountryClasses(geoJson: InterfaceGeoJson): InterfaceGeoJson {
+        geoJson.features.forEach(feature => {
+            if (feature.properties.class) {
+                return;
+            }
+
+            feature.properties.class = 'country';
+        });
+        return geoJson;
+    }
+
+    /**
      * Returns a feature from given city.
      *
      * @param city
@@ -143,10 +160,11 @@ export class DataConverter {
                 name: city.name,
                 fill: this.propertiesCityFill,
                 stroke: this.propertiesCityStroke,
-                "stroke-width": this.propertiesCityStrokeWidth
+                "stroke-width": this.propertiesCityStrokeWidth,
+                class: "place"
             },
             name: city.name,
-            id: `Place-${city.name}`
+            id: `place-${city.name.toLowerCase()}`
         };
     }
 
@@ -178,14 +196,12 @@ export class DataConverter {
      * @private
      */
     private prepareGeoJsonData(geoJson: InterfaceGeoJson, country: string|null): InterfaceGeoJson {
-        return this.addConfigToSelectedCountry(
-            this.addIdsAndNames(
-                this.coordinateConverter.convertToMercatorProjection(
-                    this.addCities(geoJson)
-                )
-            ),
-            country
-        );
+        geoJson = this.addCountryClasses(geoJson);
+        geoJson = this.addCities(geoJson);
+        geoJson = this.addIdsAndNames(geoJson);
+        geoJson = this.addConfigToSelectedCountry(geoJson, country);
+
+        return  this.coordinateConverter.convertToMercatorProjection(geoJson);
     }
 
     /**
