@@ -19,13 +19,23 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent }) => {
         width: svgContent.viewBoxWidth,
         height: svgContent.viewBoxHeight
     });
-    const svgRef = useRef<SVGSVGElement>(null);
+    const svgRef = useRef<SVGSVGElement>(null!);
 
+    /**
+     * Handles the mouse down event (Start drag and drop).
+     *
+     * @param event
+     */
     const handleMouseDown = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
         setIsPanning(true);
         setStartPoint({ x: event.clientX, y: event.clientY });
     };
 
+    /**
+     * Handles the mouse move event (Do drag and drop).
+     *
+     * @param event
+     */
     const handleMouseMove = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
         if (!isPanning || !svgRef.current) return;
 
@@ -33,20 +43,31 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent }) => {
         const dx = (startPoint.x - event.clientX) * (viewBox.width / svgRect.width);
         const dy = (startPoint.y - event.clientY) * (viewBox.height / svgRect.height);
 
-        setViewBox(prevViewBox => ({
-            ...prevViewBox,
-            x: prevViewBox.x + dx,
-            y: prevViewBox.y + dy
-        }));
+        setViewBox({
+            width: viewBox.width,
+            height: viewBox.height,
+            x: viewBox.x + dx,
+            y: viewBox.y + dy
+        });
         setStartPoint({ x: event.clientX, y: event.clientY });
     };
 
+    /**
+     * Handles the mouse up event (Finish drag and drop).
+     */
     const handleMouseUp = () => {
         setIsPanning(false);
     };
 
-    const handleWheel = (event: React.WheelEvent<SVGSVGElement>) => {
-        if (!svgRef.current) return;
+    /**
+     * Handles the mouse wheel event (Zoom in/out).
+     *
+     * @param event
+     */
+    const handleWheel = (event: React.WheelEvent<SVGSVGElement>|WheelEvent) => {
+        if (!svgRef.current) {
+            return;
+        }
 
         event.preventDefault();
         const { clientX, clientY, deltaY } = event;
@@ -57,17 +78,19 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent }) => {
 
         const mouseX = clientX - svgRect.left;
         const mouseY = clientY - svgRect.top;
+
         const newWidth = viewBox.width * scale;
         const newHeight = viewBox.height * scale;
-        const dx = (mouseX / svgRect.width) * (newWidth - viewBox.width);
-        const dy = (mouseY / svgRect.height) * (newHeight - viewBox.height);
 
-        setViewBox(prevViewBox => ({
-            x: prevViewBox.x + dx,
-            y: prevViewBox.y + dy,
+        const dx = (mouseX / svgRect.width) * (viewBox.width - newWidth);
+        const dy = (mouseY / svgRect.height) * (viewBox.height - newHeight);
+
+        setViewBox({
+            x: viewBox.x + dx,
+            y: viewBox.y + dy,
             width: newWidth,
             height: newHeight
-        }));
+        });
     };
 
     useEffect(() => {
@@ -75,11 +98,13 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent }) => {
 
         if (svgElement) {
             svgElement.addEventListener('mouseleave', handleMouseUp);
+            svgElement.addEventListener('wheel', handleWheel, { passive: false });
         }
 
         return () => {
             if (svgElement) {
                 svgElement.removeEventListener('mouseleave', handleMouseUp);
+                svgElement.removeEventListener('wheel', handleWheel);
             }
         };
     }, []);
@@ -105,7 +130,7 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent }) => {
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 onWheel={handleWheel}
-                style={{ cursor: isPanning ? 'grabbing' : 'grab' }}
+                style={{ cursor: isPanning ? 'move' : 'default' }}
             />
         </>
     );
