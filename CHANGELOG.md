@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Changelogs
 
+### [0.1.7] - 2024-07-20
+
+* Add hovers to countries and cities
+* Add country translations
+* Add own geoJson2Path converter and map (old map is removed)
+  * Add Drag n drop to svg map
+  * Add zoom to map via mouse scroll wheel
+* Bugfixes
+  * Fix the center point when zooming
+  * Do not reset the map if the resolution has changed
+
 ### [0.1.6] - 2024-07-15
 
 * Add demo link to README.md
