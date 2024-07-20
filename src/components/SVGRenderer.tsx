@@ -5,7 +5,7 @@ interface SVGRendererProps {
     svgContent: TypeSvgContent;
     width: number;
     height: number;
-    country: string|null;
+    country: string | null;
 }
 
 /**
@@ -21,12 +21,8 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
         height: svgContent.viewBoxHeight
     });
     const svgRef = useRef<SVGSVGElement>(null!);
+    const lastTouchDistanceRef = useRef<number | null>(null);
 
-    /**
-     * Handles the mouse/touch down event (Start drag and drop).
-     *
-     * @param event
-     */
     const handleStart = (event: React.MouseEvent<SVGSVGElement, MouseEvent> | React.TouchEvent<SVGSVGElement>) => {
         setIsPanning(true);
         const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX;
@@ -34,11 +30,6 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
         setStartPoint({ x: clientX, y: clientY });
     };
 
-    /**
-     * Handles the mouse/touch move event (Do drag and drop).
-     *
-     * @param event
-     */
     const handleMove = (event: React.MouseEvent<SVGSVGElement, MouseEvent> | React.TouchEvent<SVGSVGElement>) => {
         if (!isPanning || !svgRef.current) return;
 
@@ -57,18 +48,11 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
         setStartPoint({ x: clientX, y: clientY });
     };
 
-    /**
-     * Handles the mouse/touch up event (Finish drag and drop).
-     */
     const handleEnd = () => {
         setIsPanning(false);
+        lastTouchDistanceRef.current = null;
     };
 
-    /**
-     * Handles the mouse wheel and touch pinch event (Zoom in/out).
-     *
-     * @param event
-     */
     const handleWheel = (event: React.WheelEvent<SVGSVGElement> | WheelEvent) => {
         if (!svgRef.current) return;
 
@@ -105,13 +89,12 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
         const touch2 = event.touches[1];
         const distance = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
 
-        if (!svgRef.current.dataset.lastTouchDistance) {
-            svgRef.current.dataset.lastTouchDistance = distance.toString();
+        if (lastTouchDistanceRef.current === null) {
+            lastTouchDistanceRef.current = distance;
             return;
         }
 
-        const lastDistance = parseFloat(svgRef.current.dataset.lastTouchDistance);
-        const scale = distance / lastDistance;
+        const scale = distance / lastTouchDistanceRef.current;
 
         const centerX = (touch1.clientX + touch2.clientX) / 2 - svgRect.left;
         const centerY = (touch1.clientY + touch2.clientY) / 2 - svgRect.top;
@@ -129,7 +112,7 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
             height: newHeight
         });
 
-        svgRef.current.dataset.lastTouchDistance = distance.toString();
+        lastTouchDistanceRef.current = distance;
     };
 
     useEffect(() => {
