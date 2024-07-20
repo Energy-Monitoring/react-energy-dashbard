@@ -45,6 +45,31 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent }) => {
         setIsPanning(false);
     };
 
+    const handleWheel = (event: React.WheelEvent<SVGSVGElement>) => {
+        if (!svgRef.current) return;
+
+        event.preventDefault();
+        const { clientX, clientY, deltaY } = event;
+        const svgRect = svgRef.current.getBoundingClientRect();
+        const zoomFactor = 1.1;
+        const direction = deltaY > 0 ? 1 : -1;
+        const scale = direction > 0 ? zoomFactor : 1 / zoomFactor;
+
+        const mouseX = clientX - svgRect.left;
+        const mouseY = clientY - svgRect.top;
+        const newWidth = viewBox.width * scale;
+        const newHeight = viewBox.height * scale;
+        const dx = (mouseX / svgRect.width) * (newWidth - viewBox.width);
+        const dy = (mouseY / svgRect.height) * (newHeight - viewBox.height);
+
+        setViewBox(prevViewBox => ({
+            x: prevViewBox.x + dx,
+            y: prevViewBox.y + dy,
+            width: newWidth,
+            height: newHeight
+        }));
+    };
+
     useEffect(() => {
         const svgElement = svgRef.current;
 
@@ -79,7 +104,8 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent }) => {
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
-                style={{ cursor: isPanning ? 'move' : 'default' }}
+                onWheel={handleWheel}
+                style={{ cursor: isPanning ? 'grabbing' : 'grab' }}
             />
         </>
     );
