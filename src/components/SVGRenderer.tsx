@@ -21,13 +21,19 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
         height: svgContent.viewBoxHeight
     });
     const svgRef = useRef<SVGSVGElement>(null!);
-    const lastTouchDistanceRef = useRef<number | null>(null);
+    const initialDistanceRef = useRef<number | null>(null);
 
     const handleStart = (event: React.MouseEvent<SVGSVGElement, MouseEvent> | React.TouchEvent<SVGSVGElement>) => {
         setIsPanning(true);
         const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX;
         const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY;
         setStartPoint({ x: clientX, y: clientY });
+
+        if ('touches' in event && event.touches.length === 2) {
+            const touch1 = event.touches[0];
+            const touch2 = event.touches[1];
+            initialDistanceRef.current = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
+        }
     };
 
     const handleMove = (event: React.MouseEvent<SVGSVGElement, MouseEvent> | React.TouchEvent<SVGSVGElement>) => {
@@ -36,21 +42,47 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
         const svgRect = svgRef.current.getBoundingClientRect();
         const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX;
         const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY;
-        const dx = (startPoint.x - clientX) * (viewBox.width / svgRect.width);
-        const dy = (startPoint.y - clientY) * (viewBox.height / svgRect.height);
 
-        setViewBox({
-            width: viewBox.width,
-            height: viewBox.height,
-            x: viewBox.x + dx,
-            y: viewBox.y + dy
-        });
-        setStartPoint({ x: clientX, y: clientY });
+        if ('touches' in event && event.touches.length === 2 && initialDistanceRef.current) {
+            const touch1 = event.touches[0];
+            const touch2 = event.touches[1];
+            const newDistance = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
+            const scale = newDistance / initialDistanceRef.current;
+
+            const centerX = (touch1.clientX + touch2.clientX) / 2 - svgRect.left;
+            const centerY = (touch1.clientY + touch2.clientY) / 2 - svgRect.top;
+
+            const newWidth = viewBox.width / scale;
+            const newHeight = viewBox.height / scale;
+
+            const dx = (centerX / svgRect.width) * (viewBox.width - newWidth);
+            const dy = (centerY / svgRect.height) * (viewBox.height - newHeight);
+
+            setViewBox({
+                x: viewBox.x + dx,
+                y: viewBox.y + dy,
+                width: newWidth,
+                height: newHeight
+            });
+
+            initialDistanceRef.current = newDistance; // Update the initial distance for the next move
+        } else {
+            const dx = (startPoint.x - clientX) * (viewBox.width / svgRect.width);
+            const dy = (startPoint.y - clientY) * (viewBox.height / svgRect.height);
+
+            setViewBox({
+                width: viewBox.width,
+                height: viewBox.height,
+                x: viewBox.x + dx,
+                y: viewBox.y + dy
+            });
+            setStartPoint({ x: clientX, y: clientY });
+        }
     };
 
     const handleEnd = () => {
         setIsPanning(false);
-        lastTouchDistanceRef.current = null;
+        initialDistanceRef.current = null;
     };
 
     const handleWheel = (event: React.WheelEvent<SVGSVGElement> | WheelEvent) => {
@@ -80,55 +112,18 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
         });
     };
 
-    const handleTouchPinch = (event: TouchEvent) => {
-        if (event.touches.length < 2 || !svgRef.current) return;
-
-        event.preventDefault();
-        const svgRect = svgRef.current.getBoundingClientRect();
-        const touch1 = event.touches[0];
-        const touch2 = event.touches[1];
-        const distance = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
-
-        if (lastTouchDistanceRef.current === null) {
-            lastTouchDistanceRef.current = distance;
-            return;
-        }
-
-        const scale = distance / lastTouchDistanceRef.current;
-
-        const centerX = (touch1.clientX + touch2.clientX) / 2 - svgRect.left;
-        const centerY = (touch1.clientY + touch2.clientY) / 2 - svgRect.top;
-
-        const newWidth = viewBox.width / scale;
-        const newHeight = viewBox.height / scale;
-
-        const dx = (centerX / svgRect.width) * (viewBox.width - newWidth);
-        const dy = (centerY / svgRect.height) * (viewBox.height - newHeight);
-
-        setViewBox({
-            x: viewBox.x + dx,
-            y: viewBox.y + dy,
-            width: newWidth,
-            height: newHeight
-        });
-
-        lastTouchDistanceRef.current = distance;
-    };
-
     useEffect(() => {
         const svgElement = svgRef.current;
 
         if (svgElement) {
             svgElement.addEventListener('mouseleave', handleEnd);
             svgElement.addEventListener('wheel', handleWheel, { passive: false });
-            svgElement.addEventListener('touchmove', handleTouchPinch, { passive: false });
         }
 
         return () => {
             if (svgElement) {
                 svgElement.removeEventListener('mouseleave', handleEnd);
                 svgElement.removeEventListener('wheel', handleWheel);
-                svgElement.removeEventListener('touchmove', handleTouchPinch);
             }
         };
     }, []);
