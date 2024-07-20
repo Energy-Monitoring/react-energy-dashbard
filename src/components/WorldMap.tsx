@@ -23,6 +23,7 @@ const WorldMap: React.FC<WorldMapProps> = ({
 }) => {
     const [dataSource, setDataSource] = useState<TypeDataSource>('low');
     const [svgContent, setSvgContent] = useState<string[]>([]);
+    const [svgString, setSvgString] = useState<string>('');
     const [translation, setTranslation] = useState<TypeCountry | null>(null);
 
     const worldMapSvg = new WorldMapSvg({
@@ -34,6 +35,7 @@ const WorldMap: React.FC<WorldMapProps> = ({
         worldMapSvg.setCountry(country);
         setSvgContent(worldMapSvg.renderSvgPaths());
         setTranslation(worldMapSvg.getTranslation());
+        setSvgString(worldMapSvg.renderSvgString(country));
     }, [dataSource, country]);
 
     return (
@@ -46,12 +48,14 @@ const WorldMap: React.FC<WorldMapProps> = ({
                 </div>
                 <div className="copyright">
                     <strong>WorldMapSvg</strong> build by <a href="https://www.hempel.li/" target="_blank"
-                                            rel="noopener noreferrer">bjoern hempel</a>
+                                                             rel="noopener noreferrer">bjoern hempel</a>
                 </div>
-                <SVGRenderer svgContent={svgContent} width={width} height={height}/>
+                <div dangerouslySetInnerHTML={{__html: svgString}}></div>
+
+                {/*<SVGRenderer svgContent={svgContent} width={width} height={height}/>*/}
             </div>
             <div className="panel-switcher">
-                <strong>Auflösung</strong>:
+            <strong>Auflösung</strong>:
                 <label>
                     <input
                         type="radio"

@@ -4,7 +4,9 @@ export const boundingBoxEuropeProj4326: TypeBoundingBox = {
     longitudeMin: -31.266001,
     latitudeMin: 34.5428,
     longitudeMax: 39.869301,
-    latitudeMax: 71.185474
+    latitudeMax: 71.185474,
+    width: 1,
+    height: 1
 };
 
 export const proj4326 = 'EPSG:4326';

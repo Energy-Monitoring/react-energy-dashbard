@@ -102,6 +102,12 @@ code {
         path.place:hover {
             stroke-width: 2px;
         }
+        circle.place {
+            fill: #008000;
+        }
+        circle.place:hover {
+            fill: #008000;
+        }
     }
 
     .controls-container {

@@ -41,23 +41,43 @@ export class DataConverter {
     constructor(options: DataConverterOptions = {}) { }
 
     /**
+     * Checks the ISO code for correctness.
+     *
+     * @param isoCode
+     * @private
+     */
+    private checkIsoCode(isoCode: string): boolean {
+
+        /* The given code must only contain two characters. */
+        if (isoCode.length !== 2) {
+            return false;
+        }
+
+        return /^[A-Z]{2}$/.test(isoCode);
+    }
+
+    /**
      * Returns the id from given feature.
      *
      * @param feature
      */
-    public getId(feature: TypeFeature): string {
+    public getIsoCode(feature: TypeFeature): string {
         let id: string|null = null;
 
-        if (feature.hasOwnProperty('id')) {
+        if (feature.properties.hasOwnProperty('iso_a2')) {
+            id = feature.properties.iso_a2 ?? null;
+        }
+
+        if ((id === null || !this.checkIsoCode(id)) && feature.properties.hasOwnProperty('iso_a2_eh')) {
+            id = feature.properties.iso_a2_eh ?? null;
+        }
+
+        if ((id === null || !this.checkIsoCode(id)) && feature.hasOwnProperty('id')) {
             id = feature.id ?? null;
         }
 
-        if (feature.properties.hasOwnProperty('wb_a2')) {
-            id = feature.properties.wb_a2 ?? null;
-        }
-
         if (typeof id !== 'string') {
-            throw new Error('Can not find feature.id or feature.properties.wb_a2 to determine the country id.');
+            throw new Error('Can not find feature.id or feature.properties.iso_a2 to determine the country id.');
         }
 
         return id;
@@ -102,7 +122,7 @@ export class DataConverter {
      */
     private addIdsAndNames(geoJson: InterfaceGeoJson): InterfaceGeoJson {
         const convertedFeatures = geoJson.features.map(feature => {
-            let id = this.getId(feature);
+            let id = this.getIsoCode(feature);
 
             let convertedFeature = {
                 ...feature,

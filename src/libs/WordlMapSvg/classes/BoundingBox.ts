@@ -42,10 +42,10 @@ export class BoundingBox {
      * @param featureMap
      */
     private calculateBoundingBoxAll(featureMap: TypeFeatureMap): TypeBoundingBox {
-        let minLongitude = Infinity,
-            minLatitude = Infinity,
-            maxLongitude = -Infinity,
-            maxLatitude = -Infinity;
+        let longitudeMin = Infinity,
+            latitudeMin = Infinity,
+            longitudeMax = -Infinity,
+            latitudeMax = -Infinity;
 
         for (const key in featureMap) {
             if (!featureMap.hasOwnProperty(key)) {
@@ -60,25 +60,27 @@ export class BoundingBox {
                 latitudeMax: maxLatitudeTmp
             } = this.calculateBoundingBoxCountry(feature);
 
-            if (minLongitudeTmp < minLongitude) {
-                minLongitude = minLongitudeTmp;
+            if (minLongitudeTmp < longitudeMin) {
+                longitudeMin = minLongitudeTmp;
             }
-            if (minLatitudeTmp < minLatitude) {
-                minLatitude = minLatitudeTmp;
+            if (minLatitudeTmp < latitudeMin) {
+                latitudeMin = minLatitudeTmp;
             }
-            if (maxLongitudeTmp > maxLongitude) {
-                maxLongitude = maxLongitudeTmp;
+            if (maxLongitudeTmp > longitudeMax) {
+                longitudeMax = maxLongitudeTmp;
             }
-            if (maxLatitudeTmp > maxLatitude) {
-                maxLatitude = maxLatitudeTmp;
+            if (maxLatitudeTmp > latitudeMax) {
+                latitudeMax = maxLatitudeTmp;
             }
         }
 
         return {
-            longitudeMin: minLongitude,
-            latitudeMin: minLatitude,
-            longitudeMax: maxLongitude,
-            latitudeMax: maxLatitude
+            longitudeMin: longitudeMin,
+            latitudeMin: latitudeMin,
+            longitudeMax: longitudeMax,
+            latitudeMax: latitudeMax,
+            width: longitudeMax - longitudeMin,
+            height: latitudeMax - latitudeMin
         };
     }
 
@@ -121,7 +123,9 @@ export class BoundingBox {
             longitudeMin: pointMin[0],
             latitudeMin: pointMin[1],
             longitudeMax: pointMax[0],
-            latitudeMax: pointMax[1]
+            latitudeMax: pointMax[1],
+            width: pointMax[0] - pointMin[0],
+            height: pointMax[1] - pointMin[1]
         };
     }
 
@@ -133,7 +137,9 @@ export class BoundingBox {
             longitudeMin: .0,
             latitudeMin: .0,
             longitudeMax: 1.,
-            latitudeMax: 1.
+            latitudeMax: 1.,
+            width: 1.,
+            height: 1.
         };
     }
 
@@ -174,16 +180,18 @@ export class BoundingBox {
      * @param point
      */
     private calculateBoundingBoxFromPoint(point: TypePoint): TypeBoundingBox {
-        let minLongitude = point[0],
-            minLatitude = point[1],
-            maxLongitude = point[0],
-            maxLatitude = point[1];
+        let longitudeMin = point[0],
+            latitudeMin = point[1],
+            longitudeMax = point[0],
+            latitudeMax = point[1];
 
         return {
-            longitudeMin: minLongitude,
-            latitudeMin: minLatitude,
-            longitudeMax: maxLongitude,
-            latitudeMax: maxLatitude
+            longitudeMin: longitudeMin,
+            latitudeMin: latitudeMin,
+            longitudeMax: longitudeMax,
+            latitudeMax: latitudeMax,
+            width: longitudeMax - longitudeMin,
+            height: latitudeMax - latitudeMin
         };
     }
 
@@ -193,31 +201,33 @@ export class BoundingBox {
      * @param line
      */
     private calculateBoundingBoxLineString(line: TypeLine): TypeBoundingBox {
-        let minLongitude = Infinity,
-            minLatitude = Infinity,
-            maxLongitude = -Infinity,
-            maxLatitude = -Infinity;
+        let longitudeMin = Infinity,
+            latitudeMin = Infinity,
+            longitudeMax = -Infinity,
+            latitudeMax = -Infinity;
 
         for (const [longitude, latitude] of line) {
-            if (longitude < minLongitude) {
-                minLongitude = longitude;
+            if (longitude < longitudeMin) {
+                longitudeMin = longitude;
             }
-            if (latitude < minLatitude) {
-                minLatitude = latitude;
+            if (latitude < latitudeMin) {
+                latitudeMin = latitude;
             }
-            if (longitude > maxLongitude) {
-                maxLongitude = longitude;
+            if (longitude > longitudeMax) {
+                longitudeMax = longitude;
             }
-            if (latitude > maxLatitude) {
-                maxLatitude = latitude;
+            if (latitude > latitudeMax) {
+                latitudeMax = latitude;
             }
         }
 
         return {
-            longitudeMin: minLongitude,
-            latitudeMin: minLatitude,
-            longitudeMax: maxLongitude,
-            latitudeMax: maxLatitude
+            longitudeMin: longitudeMin,
+            latitudeMin: latitudeMin,
+            longitudeMax: longitudeMax,
+            latitudeMax: latitudeMax,
+            width: longitudeMax - longitudeMin,
+            height: latitudeMax - latitudeMin
         };
     }
 
@@ -227,25 +237,27 @@ export class BoundingBox {
      * @param polygon
      */
     private calculateBoundingBoxFromPolygon(polygon: TypePolygon): TypeBoundingBox {
-        let minLongitude = Infinity,
-            minLatitude = Infinity,
-            maxLongitude = -Infinity,
-            maxLatitude = -Infinity;
+        let longitudeMin = Infinity,
+            latitudeMin = Infinity,
+            longitudeMax = -Infinity,
+            latitudeMax = -Infinity;
 
         for (const ring of polygon) {
             for (const [longitude, latitude] of ring) {
-                if (longitude < minLongitude) minLongitude = longitude;
-                if (latitude < minLatitude) minLatitude = latitude;
-                if (longitude > maxLongitude) maxLongitude = longitude;
-                if (latitude > maxLatitude) maxLatitude = latitude;
+                if (longitude < longitudeMin) longitudeMin = longitude;
+                if (latitude < latitudeMin) latitudeMin = latitude;
+                if (longitude > longitudeMax) longitudeMax = longitude;
+                if (latitude > latitudeMax) latitudeMax = latitude;
             }
         }
 
         return {
-            longitudeMin: minLongitude,
-            latitudeMin: minLatitude,
-            longitudeMax: maxLongitude,
-            latitudeMax: maxLatitude
+            longitudeMin: longitudeMin,
+            latitudeMin: latitudeMin,
+            longitudeMax: longitudeMax,
+            latitudeMax: latitudeMax,
+            width: longitudeMax - longitudeMin,
+            height: latitudeMax - latitudeMin
         };
     }
 
@@ -275,7 +287,9 @@ export class BoundingBox {
             longitudeMin: longitudeMin,
             latitudeMin: latitudeMin,
             longitudeMax: longitudeMax,
-            latitudeMax: latitudeMax
+            latitudeMax: latitudeMax,
+            width: longitudeMax - longitudeMin,
+            height: latitudeMax - latitudeMin
         };
     }
 
@@ -326,11 +340,19 @@ export class BoundingBox {
         const zoomGapBoundingBoxLongitude = factorGapLongitude * longitudeDistance;
         const zoomGapBoundingBoxLatitude = factorGapLatitude * latitudeDistance;
 
+        const longitudeMinCalc = longitudeCenter - longitudeDistanceLeft - zoomGapBoundingBoxLongitude;
+        const latitudeMinCalc = latitudeCenter - latitudeDistanceTop - zoomGapBoundingBoxLatitude;
+
+        const longitudeMaxCalc = longitudeCenter + longitudeDistanceRight + zoomGapBoundingBoxLongitude;
+        const latitudeMaxCalc = latitudeCenter + latitudeDistanceBottom + zoomGapBoundingBoxLatitude;
+
         return {
-            longitudeMin: longitudeCenter - longitudeDistanceLeft - zoomGapBoundingBoxLongitude,
-            latitudeMin: latitudeCenter - latitudeDistanceTop - zoomGapBoundingBoxLatitude,
-            longitudeMax: longitudeCenter + longitudeDistanceRight + zoomGapBoundingBoxLongitude,
-            latitudeMax: latitudeCenter + latitudeDistanceBottom + zoomGapBoundingBoxLatitude
+            longitudeMin: longitudeMinCalc,
+            latitudeMin: latitudeMinCalc,
+            longitudeMax: longitudeMaxCalc,
+            latitudeMax: latitudeMaxCalc,
+            width: longitudeMaxCalc - longitudeMinCalc,
+            height: latitudeMaxCalc - latitudeMinCalc
         };
     }
 

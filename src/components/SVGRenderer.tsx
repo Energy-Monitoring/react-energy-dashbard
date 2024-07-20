@@ -15,11 +15,13 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height }) 
     const viewBoxValue = `0 0 ${width} ${height}`;
 
     return (
-        <svg
-            viewBox={viewBoxValue}
-            dangerouslySetInnerHTML={{ __html: svgContentCombined }}
-            xmlns="http://www.w3.org/2000/svg"
-        />
+        <>
+            <svg
+                viewBox={viewBoxValue}
+                dangerouslySetInnerHTML={{__html: svgContentCombined}}
+                xmlns="http://www.w3.org/2000/svg"
+            />
+        </>
     );
 };
 

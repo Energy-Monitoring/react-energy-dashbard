@@ -13,6 +13,7 @@ export const countries: TypeCountry[] = [
 
     { code: "al",  name: "Albanien" },
     { code: "am",  name: "Armenien" },
+    { code: "ax",  name: "Åland" },
     { code: "az",  name: "Aserbaidschan" },
     { code: "be",  name: "Belgien" },
     { code: "ba",  name: "Bosnien-Herzegowina" },
@@ -46,7 +47,7 @@ export const countries: TypeCountry[] = [
     { code: "se",  name: "Schweden" },
     { code: "rs",  name: "Serbien" },
     { code: "sk",  name: "Slowakische Republik" },
-    { code: "sl",  name: "Slowenien" },
+    { code: "si",  name: "Slowenien" },
     { code: "es",  name: "Spanien" },
     { code: "cz",  name: "Tschechische Republik" },
     { code: "tr",  name: "Türkei" },
@@ -55,9 +56,17 @@ export const countries: TypeCountry[] = [
     { code: "gb",  name: "Vereinigtes Königreich" },
     { code: "by",  name: "Weißrussland" },
     { code: "cy",  name: "Zypern" },
+
+    { code: "kz",  name: "Kasachstan" },
+    { code: "tm",  name: "Turkmenistan" },
+    { code: "uz",  name: "Usbekistan" },
+
+    { code: "xx",  name: "Unknown country" },
 ];
 
 export const countryMap: {[key: string]: TypeCountry} = countries.reduce((map, country) => {
     map[country.code] = country;
     return map;
 }, {} as { [key: string]: TypeCountry });
+
+console.log(countryMap);

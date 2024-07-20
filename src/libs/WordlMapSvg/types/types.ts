@@ -5,7 +5,8 @@ export type TypeProperties = {
     fill?: string;
     stroke?: string;
     "stroke-width"?: number;
-    "wb_a2"?: string;
+    "iso_a2"?: string;
+    "iso_a2_eh"?: string;
     [key: string]: any;
 };
 
@@ -68,4 +69,6 @@ export type TypeBoundingBox = {
     latitudeMin: number;
     longitudeMax: number;
     latitudeMax: number;
+    width: number;
+    height: number;
 };

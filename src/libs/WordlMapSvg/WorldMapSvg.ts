@@ -6,6 +6,7 @@ import {
 } from "./types/types";
 import {BoundingBox} from "./classes/BoundingBox";
 import {DataConverter} from "./classes/DataConverter";
+import {GeoJson2Path} from "./classes/GeoJson2Path";
 
 interface WorldMapSvgOptions {
     country?: string | null;
@@ -43,6 +44,8 @@ export class WorldMapSvg {
     private dataConverter: DataConverter = new DataConverter();
 
     private boundingBox: BoundingBox = new BoundingBox();
+
+    private geoJson2Path: GeoJson2Path = new GeoJson2Path();
 
     private readonly propertyCountryDefault: TypeCountryKey = null;
 
@@ -122,7 +125,7 @@ export class WorldMapSvg {
         const countryMap: TypeFeatureMap = {};
 
         geoJson.features.forEach(feature => {
-            countryMap[this.dataConverter.getId(feature)] = feature;
+            countryMap[this.dataConverter.getIsoCode(feature)] = feature;
         });
 
         return countryMap;
@@ -210,6 +213,31 @@ export class WorldMapSvg {
         });
 
         return this.addTitlesToSvgElements(converter.convert(this.data), this.data.features);
+    }
+
+    public renderSvgString(country: string|null): string {
+        let boundingType = this.boundingBox.getBoundingType(this.country, this.countryKey, this.zoomCountry);
+
+        /* Calculates the bounding box without gap or centering ("raw" bounding box). */
+        let boundingBox = this.boundingBox.calculateBoundingBox(
+            this.dataIdMap,
+            boundingType,
+            this.countryKey
+        );
+
+        const factorGapLongitude = boundingType === 'country' ? this.zoomGapBoundingBoxLongitudeFactor : this.zoomGapBoundingBoxLongitudeFactorAll;
+        const factorGapLatitude = boundingType === 'country' ? this.zoomGapBoundingBoxLatitudeFactor : this.zoomGapBoundingBoxLatitudeFactorAll;
+
+        /* Centers the bounding box to output svg and add a gap. */
+        boundingBox = this.boundingBox.centerBoundingBox(
+            boundingBox,
+            this.width,
+            this.height,
+            factorGapLongitude,
+            factorGapLatitude
+        );
+
+        return this.geoJson2Path.generateSVG(this.data, boundingBox, country, this.width, this.height);
     }
 
     /**
