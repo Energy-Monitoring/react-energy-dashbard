@@ -108,7 +108,7 @@ export class GeoJson2Path {
             if (type === 'Polygon') {
                 const sameCountry = (country ? country.toUpperCase() : null) === feature.id;
                 const id = feature.id ? feature.id.toUpperCase() : 'XX';
-                const name = id.toLowerCase() in countryMap ? countryMap[id.toLowerCase()].name : id;
+                const name = id.toLowerCase() in countryMap ? countryMap[id.toLowerCase()].nameDe : id;
 
                 (coordinates as number[][][]).forEach(ring => {
                     paths.push({
@@ -124,7 +124,7 @@ export class GeoJson2Path {
             } else if (type === 'MultiPolygon') {
                 const sameCountry = (country ? country?.toUpperCase() : null) === feature.id;
                 const id = feature.id ? feature.id.toUpperCase() : 'XX';
-                const name = id.toLowerCase() in countryMap ? countryMap[id.toLowerCase()].name : id;
+                const name = id.toLowerCase() in countryMap ? countryMap[id.toLowerCase()].nameDe : id;
 
                 const multiPolygonPath = (coordinates as number[][][][]).map(polygon => {
                     return polygon.map(ring => this.convertCoordsToPath(ring)).join(' ');

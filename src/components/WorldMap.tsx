@@ -43,14 +43,14 @@ const WorldMap: React.FC<WorldMapProps> = ({
             <p>Ausgewähltes Land oder Bereich.</p>
             <div className="svg">
                 <div className="svg-title">
-                    {translation ? `Karte von "${translation.name}"` : 'Weltkarte'}
+                    {translation ? `Karte von "${translation.nameDe}"` : 'Weltkarte'}
                 </div>
                 <div className="copyright">
                     <strong>WorldMapSvg</strong> build by <a href="https://www.hempel.li/" target="_blank"
                                                              rel="noopener noreferrer">bjoern hempel</a>
                 </div>
                 {
-                    svg && <SVGRenderer svgContent={svg} width={width} height={height}/>
+                    svg && <SVGRenderer svgContent={svg} width={width} height={height} country={country}/>
                 }
             </div>
             <div className="panel-switcher">

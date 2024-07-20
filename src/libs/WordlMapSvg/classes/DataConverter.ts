@@ -135,7 +135,7 @@ export class DataConverter {
                 return convertedFeature;
             }
 
-            convertedFeature.name = countryMap[country].name;
+            convertedFeature.name = countryMap[country].nameDe;
 
             return convertedFeature;
         });

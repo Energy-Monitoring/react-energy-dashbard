@@ -5,12 +5,13 @@ interface SVGRendererProps {
     svgContent: TypeSvgContent;
     width: number;
     height: number;
+    country: string|null;
 }
 
 /**
  * SVGRenderer component.
  */
-const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent }) => {
+const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, country }) => {
     const [isPanning, setIsPanning] = useState(false);
     const [startPoint, setStartPoint] = useState({ x: 0, y: 0 });
     const [viewBox, setViewBox] = useState({
@@ -116,7 +117,7 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent }) => {
             width: svgContent.viewBoxWidth,
             height: svgContent.viewBoxHeight
         });
-    }, [svgContent]);
+    }, [country, svgContent]);
 
     return (
         <>
