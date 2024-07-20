@@ -23,26 +23,30 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
     const svgRef = useRef<SVGSVGElement>(null!);
 
     /**
-     * Handles the mouse down event (Start drag and drop).
+     * Handles the mouse/touch down event (Start drag and drop).
      *
      * @param event
      */
-    const handleMouseDown = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    const handleStart = (event: React.MouseEvent<SVGSVGElement, MouseEvent> | React.TouchEvent<SVGSVGElement>) => {
         setIsPanning(true);
-        setStartPoint({ x: event.clientX, y: event.clientY });
+        const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX;
+        const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY;
+        setStartPoint({ x: clientX, y: clientY });
     };
 
     /**
-     * Handles the mouse move event (Do drag and drop).
+     * Handles the mouse/touch move event (Do drag and drop).
      *
      * @param event
      */
-    const handleMouseMove = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    const handleMove = (event: React.MouseEvent<SVGSVGElement, MouseEvent> | React.TouchEvent<SVGSVGElement>) => {
         if (!isPanning || !svgRef.current) return;
 
         const svgRect = svgRef.current.getBoundingClientRect();
-        const dx = (startPoint.x - event.clientX) * (viewBox.width / svgRect.width);
-        const dy = (startPoint.y - event.clientY) * (viewBox.height / svgRect.height);
+        const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX;
+        const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY;
+        const dx = (startPoint.x - clientX) * (viewBox.width / svgRect.width);
+        const dy = (startPoint.y - clientY) * (viewBox.height / svgRect.height);
 
         setViewBox({
             width: viewBox.width,
@@ -50,25 +54,23 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
             x: viewBox.x + dx,
             y: viewBox.y + dy
         });
-        setStartPoint({ x: event.clientX, y: event.clientY });
+        setStartPoint({ x: clientX, y: clientY });
     };
 
     /**
-     * Handles the mouse up event (Finish drag and drop).
+     * Handles the mouse/touch up event (Finish drag and drop).
      */
-    const handleMouseUp = () => {
+    const handleEnd = () => {
         setIsPanning(false);
     };
 
     /**
-     * Handles the mouse wheel event (Zoom in/out).
+     * Handles the mouse wheel and touch pinch event (Zoom in/out).
      *
      * @param event
      */
-    const handleWheel = (event: React.WheelEvent<SVGSVGElement>|WheelEvent) => {
-        if (!svgRef.current) {
-            return;
-        }
+    const handleWheel = (event: React.WheelEvent<SVGSVGElement> | WheelEvent) => {
+        if (!svgRef.current) return;
 
         event.preventDefault();
         const { clientX, clientY, deltaY } = event;
@@ -94,18 +96,56 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
         });
     };
 
+    const handleTouchPinch = (event: TouchEvent) => {
+        if (event.touches.length < 2 || !svgRef.current) return;
+
+        event.preventDefault();
+        const svgRect = svgRef.current.getBoundingClientRect();
+        const touch1 = event.touches[0];
+        const touch2 = event.touches[1];
+        const distance = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
+
+        if (!svgRef.current.dataset.lastTouchDistance) {
+            svgRef.current.dataset.lastTouchDistance = distance.toString();
+            return;
+        }
+
+        const lastDistance = parseFloat(svgRef.current.dataset.lastTouchDistance);
+        const scale = distance / lastDistance;
+
+        const centerX = (touch1.clientX + touch2.clientX) / 2 - svgRect.left;
+        const centerY = (touch1.clientY + touch2.clientY) / 2 - svgRect.top;
+
+        const newWidth = viewBox.width / scale;
+        const newHeight = viewBox.height / scale;
+
+        const dx = (centerX / svgRect.width) * (viewBox.width - newWidth);
+        const dy = (centerY / svgRect.height) * (viewBox.height - newHeight);
+
+        setViewBox({
+            x: viewBox.x + dx,
+            y: viewBox.y + dy,
+            width: newWidth,
+            height: newHeight
+        });
+
+        svgRef.current.dataset.lastTouchDistance = distance.toString();
+    };
+
     useEffect(() => {
         const svgElement = svgRef.current;
 
         if (svgElement) {
-            svgElement.addEventListener('mouseleave', handleMouseUp);
+            svgElement.addEventListener('mouseleave', handleEnd);
             svgElement.addEventListener('wheel', handleWheel, { passive: false });
+            svgElement.addEventListener('touchmove', handleTouchPinch, { passive: false });
         }
 
         return () => {
             if (svgElement) {
-                svgElement.removeEventListener('mouseleave', handleMouseUp);
+                svgElement.removeEventListener('mouseleave', handleEnd);
                 svgElement.removeEventListener('wheel', handleWheel);
+                svgElement.removeEventListener('touchmove', handleTouchPinch);
             }
         };
     }, []);
@@ -120,20 +160,21 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
     }, [country, svgContent]);
 
     return (
-        <>
-            <svg
-                ref={svgRef}
-                viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
-                dangerouslySetInnerHTML={{ __html: svgContent.svgPaths + svgContent.svgCircles }}
-                xmlns="http://www.w3.org/2000/svg"
-                id="svg-map"
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onWheel={handleWheel}
-                style={{ cursor: isPanning ? 'move' : 'default' }}
-            />
-        </>
+        <svg
+            ref={svgRef}
+            viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
+            dangerouslySetInnerHTML={{ __html: svgContent.svgPaths + svgContent.svgCircles }}
+            xmlns="http://www.w3.org/2000/svg"
+            id="svg-map"
+            onMouseDown={handleStart}
+            onMouseMove={handleMove}
+            onMouseUp={handleEnd}
+            onTouchStart={handleStart}
+            onTouchMove={handleMove}
+            onTouchEnd={handleEnd}
+            onWheel={handleWheel}
+            style={{ cursor: isPanning ? 'move' : 'default' }}
+        />
     );
 };
 
