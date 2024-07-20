@@ -1,12 +1,8 @@
 import {countryMap, TypeCountry} from "./config/countries";
-import {GeoJSON2SVG} from "geojson2svg";
-import {
-    InterfaceGeoJson, TypeCountryKey, TypeDataSource, TypeFeature,
-    TypeFeatureMap,
-} from "./types/types";
+import { InterfaceGeoJson, TypeCountryKey, TypeDataSource, TypeFeatureMap } from "./types/types";
 import {BoundingBox} from "./classes/BoundingBox";
 import {DataConverter} from "./classes/DataConverter";
-import {GeoJson2Path} from "./classes/GeoJson2Path";
+import {GeoJson2Path, TypeSvgContent} from "./classes/GeoJson2Path";
 
 interface WorldMapSvgOptions {
     country?: string | null;
@@ -56,14 +52,6 @@ export class WorldMapSvg {
     private readonly propertyDataSourceDefault: TypeDataSource = 'low';
 
     private readonly propertyZoomCountryDefault: boolean = true;
-
-    private readonly propertyTitleNotSpecified: string = 'Not specified';
-
-    private readonly propertiesCountryFill: string = '#d0d0d0';
-
-    private readonly propertiesCountryStroke: string = '#a0a0a0';
-
-    private readonly propertiesCountryStrokeWidth: number = .1;
 
     private readonly zoomGapBoundingBoxLongitudeFactor = .2;
 
@@ -152,70 +140,7 @@ export class WorldMapSvg {
         }
     }
 
-    /**
-     * Adds title tags to all svg elements.
-     *
-     * @param svgElements
-     * @param features
-     * @private
-     */
-    private addTitlesToSvgElements(svgElements: string[], features: TypeFeature[]): string[] {
-        return svgElements.map((svgElement, index) => {
-            const feature = features[index];
-            const title = feature.name || feature.id || this.propertyTitleNotSpecified;
-            const titleElement = `<title>${title}</title>`;
-            svgElement = svgElement.replace(/\/>/, `>${titleElement}</path>`);
-            return svgElement;
-        });
-    };
-
-    /**
-     * Renders the svg paths.
-     */
-    public renderSvgPaths(): string[] {
-        let boundingType = this.boundingBox.getBoundingType(this.country, this.countryKey, this.zoomCountry);
-
-        /* Calculates the bounding box without gap or centering ("raw" bounding box). */
-        let boundingBox = this.boundingBox.calculateBoundingBox(
-            this.dataIdMap,
-            boundingType,
-            this.countryKey
-        );
-
-        const factorGapLongitude = boundingType === 'country' ? this.zoomGapBoundingBoxLongitudeFactor : this.zoomGapBoundingBoxLongitudeFactorAll;
-        const factorGapLatitude = boundingType === 'country' ? this.zoomGapBoundingBoxLatitudeFactor : this.zoomGapBoundingBoxLatitudeFactorAll;
-
-        /* Centers the bounding box to output svg and add a gap. */
-        boundingBox = this.boundingBox.centerBoundingBox(
-            boundingBox,
-            this.width,
-            this.height,
-            factorGapLongitude,
-            factorGapLatitude
-        );
-
-        const converter: GeoJSON2SVG = new GeoJSON2SVG({
-            mapExtent: { left: boundingBox.longitudeMin, bottom: boundingBox.latitudeMin, right: boundingBox.longitudeMax, top: boundingBox.latitudeMax },
-            viewportSize: { width: this.width, height: this.height },
-            attributes: [
-                /* Default colors and properties. */
-                {property: 'fill', type: 'static', value: this.propertiesCountryFill},
-                {property: 'stroke', type: 'static', value: this.propertiesCountryStroke},
-                {property: 'stroke-width', type: 'static', value: this.propertiesCountryStrokeWidth.toString()},
-
-                /* Use colors and properties if given within geoJson data. */
-                {property: 'properties.fill', type: 'dynamic'},
-                {property: 'properties.stroke', type: 'dynamic'},
-                {property: 'properties.stroke-width', type: 'dynamic'},
-                {property: 'properties.class', type: 'dynamic'}
-            ],
-            r: this.boundingBox.getPointSizeByBoundingBox(boundingBox, boundingType)
-        });
-
-        return this.addTitlesToSvgElements(converter.convert(this.data), this.data.features);
-    }
-
-    public renderSvgString(country: string|null): string {
+    public generateSvgByCountry(country: string|null): TypeSvgContent {
         let boundingType = this.boundingBox.getBoundingType(this.country, this.countryKey, this.zoomCountry);
 
         /* Calculates the bounding box without gap or centering ("raw" bounding box). */

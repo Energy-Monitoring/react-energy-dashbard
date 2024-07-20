@@ -4,6 +4,7 @@ import { TypeCountry } from "../libs/WordlMapSvg/config/countries";
 import { WorldMapSvg } from "../libs/WordlMapSvg/WorldMapSvg";
 import {TypeDataSource} from "../libs/WordlMapSvg/types/types";
 import {zoomCountry} from "../config/chartConfig";
+import {TypeSvgContent} from "../libs/WordlMapSvg/classes/GeoJson2Path";
 
 interface WorldMapProps {
     country: string|null;
@@ -22,8 +23,7 @@ const WorldMap: React.FC<WorldMapProps> = ({
     country, width, height
 }) => {
     const [dataSource, setDataSource] = useState<TypeDataSource>('low');
-    const [svgContent, setSvgContent] = useState<string[]>([]);
-    const [svgString, setSvgString] = useState<string>('');
+    const [svg, setSvg] = useState<TypeSvgContent|null>(null);
     const [translation, setTranslation] = useState<TypeCountry | null>(null);
 
     const worldMapSvg = new WorldMapSvg({
@@ -33,9 +33,8 @@ const WorldMap: React.FC<WorldMapProps> = ({
     useEffect(() => {
         worldMapSvg.setDataSource(dataSource);
         worldMapSvg.setCountry(country);
-        setSvgContent(worldMapSvg.renderSvgPaths());
         setTranslation(worldMapSvg.getTranslation());
-        setSvgString(worldMapSvg.renderSvgString(country));
+        setSvg(worldMapSvg.generateSvgByCountry(country));
     }, [dataSource, country]);
 
     return (
@@ -50,9 +49,9 @@ const WorldMap: React.FC<WorldMapProps> = ({
                     <strong>WorldMapSvg</strong> build by <a href="https://www.hempel.li/" target="_blank"
                                                              rel="noopener noreferrer">bjoern hempel</a>
                 </div>
-                <div dangerouslySetInnerHTML={{__html: svgString}}></div>
-
-                {/*<SVGRenderer svgContent={svgContent} width={width} height={height}/>*/}
+                {
+                    svg && <SVGRenderer svgContent={svg} width={width} height={height}/>
+                }
             </div>
             <div className="panel-switcher">
             <strong>Auflösung</strong>:

@@ -24,6 +24,15 @@ export type TypeSvgCircle = {
     name: string;
 }
 
+export type TypeSvgContent = {
+    svgPaths: string;
+    svgCircles: string;
+    viewBoxLeft: number;
+    viewBoxTop: number;
+    viewBoxWidth: number;
+    viewBoxHeight: number;
+}
+
 /**
  * Class GeoJson2Path.
  *
@@ -163,13 +172,13 @@ export class GeoJson2Path {
         country: string|null,
         width: number,
         height: number
-    ): string {
-        const boundingBoxLeft = boundingBox.longitudeMin;
-        const boundingBoxTop = -boundingBox.latitudeMax;
-        const boundingBoxWidth = (boundingBox.longitudeMax - boundingBox.longitudeMin) * width / height;
-        const boundingBoxHeight = boundingBox.latitudeMax - boundingBox.latitudeMin;
+    ): TypeSvgContent {
+        const viewBoxLeft = boundingBox.longitudeMin;
+        const viewBoxTop = -boundingBox.latitudeMax;
+        const viewBoxWidth = (boundingBox.longitudeMax - boundingBox.longitudeMin) * width / height;
+        const viewBoxHeight = boundingBox.latitudeMax - boundingBox.latitudeMin;
 
-        const elements = this.convert(geoJSON, country, boundingBoxWidth);
+        const elements = this.convert(geoJSON, country, viewBoxWidth);
 
         const svgPaths = elements
             .filter((element): element is TypeSvgPath => 'path' in element)
@@ -193,11 +202,6 @@ export class GeoJson2Path {
             })
             .join('');
 
-        return `
-            <svg viewBox="${boundingBoxLeft} ${boundingBoxTop} ${boundingBoxWidth} ${boundingBoxHeight}" xmlns="http://www.w3.org/2000/svg">
-                ${svgPaths}
-                ${svgCircles}
-            </svg>
-        `;
+        return { svgPaths, svgCircles, viewBoxLeft, viewBoxTop, viewBoxWidth, viewBoxHeight };
     }
 }
