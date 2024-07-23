@@ -140,6 +140,11 @@ export class WorldMapSvg {
         }
     }
 
+    /**
+     * Generates the svg string by given country.
+     *
+     * @param country
+     */
     public generateSvgByCountry(country: string|null): TypeSvgContent {
         let boundingType = this.boundingBox.getBoundingType(this.country, this.countryKey, this.zoomCountry);
 

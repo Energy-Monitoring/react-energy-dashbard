@@ -7,6 +7,12 @@ interface SVGRendererProps {
     height: number;
     country: string | null;
 }
+interface SVGViewBox {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
 
 /**
  * SVGRenderer component.
@@ -14,7 +20,7 @@ interface SVGRendererProps {
 const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, country }) => {
     const [isPanning, setIsPanning] = useState(false);
     const [startPoint, setStartPoint] = useState({ x: 0, y: 0 });
-    const [viewBox, setViewBox] = useState({
+    const [viewBox, setViewBox] = useState<SVGViewBox>({
         x: svgContent.viewBoxLeft,
         y: svgContent.viewBoxTop,
         width: svgContent.viewBoxWidth,
@@ -22,8 +28,13 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
     });
     const svgRef = useRef<SVGSVGElement>(null!);
     const initialDistanceRef = useRef<number | null>(null);
+    const initialViewBoxRef= useRef<SVGViewBox | null>(null);
 
-    const handleStart = (event: React.MouseEvent<SVGSVGElement, MouseEvent> | React.TouchEvent<SVGSVGElement>) => {
+    const handleStart = (event: React.MouseEvent<SVGSVGElement, MouseEvent> | React.TouchEvent<SVGSVGElement> | SVGSVGElementEventMap["mousedown"] | SVGSVGElementEventMap["touchstart"]) => {
+        setDebugType('handleStart');
+
+        event.preventDefault();
+
         setIsPanning(true);
         const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX;
         const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY;
@@ -32,61 +43,84 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
         if ('touches' in event && event.touches.length === 2) {
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
+
             initialDistanceRef.current = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
+            initialViewBoxRef.current = viewBox;
         }
     };
 
-    const handleMove = (event: React.MouseEvent<SVGSVGElement, MouseEvent> | React.TouchEvent<SVGSVGElement>) => {
-        if (!isPanning || !svgRef.current) return;
+    const handleMove = (event: React.MouseEvent<SVGSVGElement, MouseEvent> | React.TouchEvent<SVGSVGElement> | SVGSVGElementEventMap["mousemove"] | SVGSVGElementEventMap["touchmove"]) => {
+        if (!isPanning || !svgRef.current) {
+            return;
+        }
+
+        event.preventDefault();
+
+        setDebugType('handleMove');
 
         const svgRect = svgRef.current.getBoundingClientRect();
         const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX;
         const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY;
 
-        if ('touches' in event && event.touches.length === 2 && initialDistanceRef.current) {
+        if (
+            'touches' in event &&
+            event.touches.length === 2 &&
+            initialDistanceRef.current &&
+            initialViewBoxRef.current
+        ) {
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
+
             const newDistance = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
+
             const scale = newDistance / initialDistanceRef.current;
 
             const centerX = (touch1.clientX + touch2.clientX) / 2 - svgRect.left;
             const centerY = (touch1.clientY + touch2.clientY) / 2 - svgRect.top;
 
-            const newWidth = viewBox.width / scale;
-            const newHeight = viewBox.height / scale;
+            const newWidth = initialViewBoxRef.current?.width / scale;
+            const newHeight = initialViewBoxRef.current?.height / scale;
 
-            const dx = (centerX / svgRect.width) * (viewBox.width - newWidth);
-            const dy = (centerY / svgRect.height) * (viewBox.height - newHeight);
+            const dx = (centerX / svgRect.width) * (initialViewBoxRef.current?.width - newWidth);
+            const dy = (centerY / svgRect.height) * (initialViewBoxRef.current?.height - newHeight);
 
-            setViewBox({
-                x: viewBox.x + dx,
-                y: viewBox.y + dy,
+            setDebugType('handleMove touch');
+
+            setViewBoxDebug({
+                x: initialViewBoxRef.current?.x + dx,
+                y: initialViewBoxRef.current?.y + dy,
                 width: newWidth,
                 height: newHeight
-            });
+            }, scale);
 
-            initialDistanceRef.current = newDistance; // Update the initial distance for the next move
-        } else {
-            const dx = (startPoint.x - clientX) * (viewBox.width / svgRect.width);
-            const dy = (startPoint.y - clientY) * (viewBox.height / svgRect.height);
-
-            setViewBox({
-                width: viewBox.width,
-                height: viewBox.height,
-                x: viewBox.x + dx,
-                y: viewBox.y + dy
-            });
-            setStartPoint({ x: clientX, y: clientY });
+            return;
         }
+
+        setDebugType('handleMove move');
+
+        const dx = (startPoint.x - clientX) * (viewBox.width / svgRect.width);
+        const dy = (startPoint.y - clientY) * (viewBox.height / svgRect.height);
+
+        setViewBoxDebug({
+            width: viewBox.width,
+            height: viewBox.height,
+            x: viewBox.x + dx,
+            y: viewBox.y + dy
+        });
+        setStartPoint({ x: clientX, y: clientY });
     };
 
     const handleEnd = () => {
         setIsPanning(false);
         initialDistanceRef.current = null;
+
+        setDebugType('handleEnd');
     };
 
     const handleWheel = (event: React.WheelEvent<SVGSVGElement> | WheelEvent) => {
         if (!svgRef.current) return;
+
+        setDebugType('handleWheel');
 
         event.preventDefault();
         const { clientX, clientY, deltaY } = event;
@@ -104,7 +138,7 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
         const dx = (mouseX / svgRect.width) * (viewBox.width - newWidth);
         const dy = (mouseY / svgRect.height) * (viewBox.height - newHeight);
 
-        setViewBox({
+        setViewBoxDebug({
             x: viewBox.x + dx,
             y: viewBox.y + dy,
             width: newWidth,
@@ -112,24 +146,69 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
         });
     };
 
+    const setDebugType = (type: string) => {
+        const element = document.getElementById('debug-map-type');
+
+        if (!element) {
+            return;
+        }
+
+        element.innerHTML = type;
+    }
+
+    const setDebugContent = (content: string) => {
+        const element = document.getElementById('debug-map-content');
+
+        if (!element) {
+            return;
+        }
+
+        element.innerHTML = content;
+    }
+
+    const setViewBoxDebug = (viewBox: SVGViewBox, scale: number|null = null) => {
+        setViewBox(viewBox);
+
+        let debugContent = 'x=' + viewBox.x + '<br>y=' + viewBox.y + '<br>width=' + viewBox.width + '<br>height=' + viewBox.height;
+
+        if (scale !== null) {
+            debugContent += '<br>scale = ' + scale;
+        }
+
+        setDebugContent(debugContent);
+    };
+
     useEffect(() => {
         const svgElement = svgRef.current;
 
         if (svgElement) {
-            svgElement.addEventListener('mouseleave', handleEnd);
+            svgElement.addEventListener('mouseleave', handleEnd, { passive: false });
             svgElement.addEventListener('wheel', handleWheel, { passive: false });
+            svgElement.addEventListener('mousedown', handleStart, { passive: false });
+            svgElement.addEventListener('mousemove', handleMove, { passive: false });
+            svgElement.addEventListener('mouseup', handleEnd, { passive: false });
+            svgElement.addEventListener('touchstart', handleStart, { passive: false });
+            svgElement.addEventListener('touchmove', handleMove, { passive: false });
+            svgElement.addEventListener('touchend', handleEnd, { passive: false });
         }
 
         return () => {
             if (svgElement) {
                 svgElement.removeEventListener('mouseleave', handleEnd);
                 svgElement.removeEventListener('wheel', handleWheel);
+                svgElement.removeEventListener('mousedown', handleStart);
+                svgElement.removeEventListener('mousemove', handleMove);
+                svgElement.removeEventListener('mouseup', handleEnd);
+                svgElement.removeEventListener('touchstart', handleStart);
+                svgElement.removeEventListener('touchmove', handleMove);
+                svgElement.removeEventListener('touchend', handleEnd);
             }
         };
     }, []);
 
     useEffect(() => {
-        setViewBox({
+        setDebugType('Initial render');
+        setViewBoxDebug({
             x: svgContent.viewBoxLeft,
             y: svgContent.viewBoxTop,
             width: svgContent.viewBoxWidth,
@@ -144,13 +223,17 @@ const SVGRenderer: React.FC<SVGRendererProps> = ({ svgContent, width, height, co
             dangerouslySetInnerHTML={{ __html: svgContent.svgPaths + svgContent.svgCircles }}
             xmlns="http://www.w3.org/2000/svg"
             id="svg-map"
+
             onMouseDown={handleStart}
             onMouseMove={handleMove}
             onMouseUp={handleEnd}
+
             onTouchStart={handleStart}
             onTouchMove={handleMove}
             onTouchEnd={handleEnd}
+
             onWheel={handleWheel}
+
             style={{ cursor: isPanning ? 'move' : 'default' }}
         />
     );

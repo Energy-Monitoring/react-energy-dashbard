@@ -12,6 +12,8 @@ interface WorldMapProps {
     height: number;
 }
 
+const debug = false;
+
 /**
  * WorldMap component.
  *
@@ -49,6 +51,12 @@ const WorldMap: React.FC<WorldMapProps> = ({
                     <strong>WorldMapSvg</strong> build by <a href="https://www.hempel.li/" target="_blank"
                                                              rel="noopener noreferrer">bjoern hempel</a>
                 </div>
+                {
+                    debug && <div className="debug">
+                        <div><span style={{fontWeight: 'bold'}}>Debug</span>: <span id="debug-map-type"></span></div>
+                        <div id="debug-map-content"></div>
+                    </div>
+                }
                 {
                     svg && <SVGRenderer svgContent={svg} width={width} height={height} country={country}/>
                 }
