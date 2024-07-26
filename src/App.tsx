@@ -15,6 +15,7 @@ import {
 import WorldMap from "./components/WorldMap";
 import {countrySelections, countryDayAheadPrices} from "./data/countries";
 import Table from "./components/Table";
+import {getSelectCountryOptionColor} from "./helper/selectHelper";
 
 const App: React.FC = () => {
     const [selectedDate, setSelectedDate] = useState<Date>(dateYesterday(HOUR_00_00_00));
@@ -35,20 +36,6 @@ const App: React.FC = () => {
 
     const minDate = new Date('2020-01-01');
     const maxDate = new Date();
-
-    const getOptionColor = (priority: number): string => {
-        switch (priority) {
-            case 2:
-                return '#000080';
-            case 1:
-                return '#008000';
-            case 0:
-                return '#202020';
-            default:
-                return '#000000';
-        }
-    };
-
     const version = process.env.REACT_APP_VERSION;
 
     return (
@@ -87,7 +74,7 @@ const App: React.FC = () => {
                                 .sort((countryA, countryB) => countryA.name.localeCompare(countryB.name))
                                 .sort((countryA, countryB) => countryA.priority > countryB.priority ? -1 : 1)
                                 .map(country => (
-                                    <option key={country.code} value={country.code} style={{ color: getOptionColor(country.priority) }}>
+                                    <option key={country.code} value={country.code} style={{ color: getSelectCountryOptionColor(country.priority) }}>
                                         {country.name}
                                     </option>
                                 ))

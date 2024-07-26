@@ -19,7 +19,7 @@ import {
     getDataPointPowerKeys, getPowerLegendPayload,
     processDatePower, processSunriseSunset
 } from "../helper/dataHelper";
-import {positions} from "../data/countries";
+import {getCoordinateCountry} from "../helper/coordinateHelper";
 
 interface PowerChartProps {
     selectedDate: Date;
@@ -71,14 +71,6 @@ const CustomLabelSunriseSunset = ({ viewBox, value }: { viewBox: any; value: str
     );
 };
 
-const getCoordinate = (selectedCountry: string): {latitude: number, longitude: number, name: string, distance: number} => {
-    if (positions.hasOwnProperty(selectedCountry)) {
-        return positions[selectedCountry];
-    }
-
-    return positions['de'];
-}
-
 /**
 * PowerChart component.
 */
@@ -100,7 +92,7 @@ const PowerChart: React.FC<PowerChartProps> = ({ selectedDate, selectedCountry})
                 const powerApiUrl = process.env.REACT_APP_POWER_API_URL;
                 const sunApiUrl = process.env.REACT_APP_SUN_API_URL;
 
-                const { latitude, longitude, name , distance } = getCoordinate(selectedCountry);
+                const { latitude, longitude, name , distance } = getCoordinateCountry(selectedCountry);
 
                 setLatitude(latitude);
                 setLongitude(longitude);
