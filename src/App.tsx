@@ -16,6 +16,8 @@ import WorldMap from "./components/WorldMap";
 import {countrySelections, countryDayAheadPrices} from "./data/countries";
 import Table from "./components/Table";
 import {getSelectCountryOptionColor} from "./helper/selectHelper";
+import {Clock} from "@ixnode/simple-clock";
+import '@ixnode/simple-clock/dist/styles.css';
 
 const App: React.FC = () => {
     const [selectedDate, setSelectedDate] = useState<Date>(dateYesterday(HOUR_00_00_00));
@@ -134,6 +136,8 @@ const App: React.FC = () => {
             </div>
             <div className="info-container">
                 <p style={{textAlign: "left"}}>Version: <a href="https://github.com/energy-monitoring/react-energy-dashbard/releases" target="_blank" rel="noopener noreferrer">{ version }</a></p>
+                <p style={{textAlign: "left"}}>Time: <a href="https://www.npmjs.com/package/@ixnode/simple-clock">ixnode/simple-clock</a></p>
+                <Clock color={'default'} size={'medium'} isAnalog={true} timeZone={"Europe/Berlin"} locale={"de-DE"} showDate={true} />
             </div>
         </div>
     );
