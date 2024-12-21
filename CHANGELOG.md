@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Changelogs
 
+### [0.1.8] - 2024-12-21
+
+* Add @ixnode/simple-clock
+
 ### [0.1.7] - 2024-07-20
 
 * Add hovers to countries and cities
